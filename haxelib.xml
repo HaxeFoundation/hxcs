@@ -1,0 +1,6 @@
+<project name="hxcs" url="https://github.com/waneck/hxcs" license="MIT">
+    <user name="waneck"/>
+    <tag v="java"/>
+    <description>Hxcs is a support library for the C# backend of the haxe compiler. In this first release, all we have are stubs, but there is plan to support automatic C# code build (with .csproj generation), hxcpp/neko CFFI support and the complete .NET standard library externs.</description>
+    <version name="2.10.0">Initial release, only stubs are created</version>
+</project>
