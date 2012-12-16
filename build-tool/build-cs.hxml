@@ -1,0 +1,6 @@
+-cp src
+-cp base/src
+-neko ../run.n
+-main Main
+-D target_cs
+-resource csproj-template.mtt
