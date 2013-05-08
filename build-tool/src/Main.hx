@@ -2,7 +2,6 @@ package ;
 
 import haxe.io.Path;
 import input.Reader;
-import neko.Lib;
 import sys.FileSystem;
 import sys.io.File;
 
@@ -12,10 +11,10 @@ import sys.io.File;
  * @author waneck
  */
 
-class Main 
+class Main
 {
-	
-	static function main() 
+
+	static function main()
 	{
 		var target = null;
 		try
@@ -24,29 +23,29 @@ class Main
 			var cmd = new CommandLine(#if target_cs "hxcs" #else "hxjava" #end);
 			var args = Sys.args();
 			var last = args[args.length - 1];
-			
+
 			var cwd = Sys.getCwd();
 			if (last != null && FileSystem.exists(last = last.substr(0,last.length-1))) //was called from haxelib
 			{
 				args.pop();
 				Sys.setCwd(cwd = last);
 			}
-			
+
 			//get options
 			cmd.process(args);
 			if (cmd.target == null)
 				throw Error.NoTarget;
-			
+
 			//read input
 			if (!FileSystem.exists(target = cmd.target))
 				throw Error.InexistentInput(target);
 			var f = File.read(target);
 			var data = new Reader(f).read();
 			f.close();
-			
+
 			data.baseDir = Tools.addPath(cwd, data.baseDir);
 			Sys.setCwd(Path.directory(Tools.addPath(cwd, cmd.target)));
-			
+
 			//compile
 			#if !target_cs
 			new compiler.java.Javac(cmd).compile(data);
@@ -54,7 +53,7 @@ class Main
 			new compiler.cs.CSharpCompiler(cmd).compile(data);
 			#end
 		}
-		
+
 		catch (e:Error)
 		{
 			switch(e)
@@ -68,12 +67,12 @@ class Main
 			case NoTarget:
 				Sys.println("No target defined");
 			}
-			
+
 			Sys.println(new CommandLine(#if target_cs "hxcs" #else "hxjava" #end).getOptions());
-			
+
 			Sys.exit(1);
 		}
-		
+
 		catch (e:input.Error)
 		{
 			Sys.println("Error when reading input file");
@@ -86,7 +85,7 @@ class Main
 			}
 			Sys.exit(2);
 		}
-		
+
 		catch (e:compiler.Error)
 		{
 			Sys.println("Compilation error");
@@ -105,6 +104,6 @@ class Main
 			}
 			Sys.exit(3);
 		}
-		
+
 	}
 }

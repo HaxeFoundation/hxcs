@@ -1,6 +1,0 @@
-<project name="hxcs" url="https://github.com/waneck/hxcs" license="MIT">
-    <user name="waneck"/>
-    <tag v="cs"/>
-    <description>Hxcs is a support library for the C# backend of the haxe compiler. There is plan to support automatic C# code build (with .csproj generation), hxcpp/neko CFFI support and the complete .NET standard library externs.</description>
-    <version name="2.10.2">Fixed compile error when class is called Main</version>
-</project>

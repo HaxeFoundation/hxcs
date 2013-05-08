@@ -11,23 +11,23 @@ class CSharpCompiler extends Compiler
 {
 	private var path:String;
 	private var compiler:String;
-	
+
 	public var version(default, null):Null<Int>;
 	public var silverlight(default, null):Bool;
 	public var unsafe(default, null):Bool;
 	public var debug(default, null):Bool;
 	public var dll(default, null):Bool;
 	public var name(default, null):String;
-	
+
 	public var data(default, null):Data;
-	
+
 	var cmd:CommandLine;
-	
-	public function new(cmd:CommandLine) 
+
+	public function new(cmd:CommandLine)
 	{
 		this.cmd = cmd;
 	}
-	
+
 	override public function compile(data:Data):Void
 	{
 		var delim = Sys.systemName() == "Windows" ? "\\" : "/";
@@ -37,8 +37,8 @@ class CSharpCompiler extends Compiler
 			FileSystem.createDirectory("bin");
 		findCompiler();
 		writeProject();
-		
-		
+
+
 		var args = ['/nologo', '/optimize' + (debug ? '-' : '+'), '/debug' + (debug ? '+' : '-'), '/unsafe' + (unsafe ? '+' : '-'), '/out:bin/' + this.name + "." + (dll ? "dll" : "exe"), '/target:' + (dll ? "library" : "exe") ];
 		if (data.main != null)
 			args.push('/main:' + (data.main == "Main" ? "EntryPoint__Main" : data.main));
@@ -46,7 +46,7 @@ class CSharpCompiler extends Compiler
 			args.push('/res:src' + delim + 'Resources' + delim + res + ",src.Resources." + res);
 		for (file in data.modules)
 			args.push("src" + delim + file.path.split(".").join(delim) + ".cs");
-		
+
 		var ret = 0;
 		try
 		{
@@ -57,32 +57,32 @@ class CSharpCompiler extends Compiler
 		{
 			throw Error.CompilerNotFound;
 		}
-		
+
 		if (ret != 0)
 			throw Error.BuildFailed;
 	}
-	
+
 	private function writeProject()
 	{
 		var bytes = new BytesOutput();
 		new CsProjWriter(bytes).write(this);
-		
+
 		var bytes = bytes.getBytes();
 		if (FileSystem.exists(this.name + ".csproj"))
 		{
 			if (File.getBytes(this.name + ".csproj").compare(bytes) == 0)
 				return;
 		}
-		
+
 		File.saveBytes(this.name + ".csproj", bytes);
 	}
-	
+
 	private function findCompiler()
 	{
 		//if windows look first for MSVC toolchain
 		if (Sys.systemName() == "Windows")
 			findMsvc();
-		
+
 		if (path == null)
 		{
 			//look for mono
@@ -101,21 +101,21 @@ class CSharpCompiler extends Compiler
 				this.compiler = "dmcs";
 			}
 		}
-		
+
 		if (path == null)
 		{
 			//TODO look for mono path
 			throw Error.CompilerNotFound;
 		}
 	}
-	
+
 	private function exists(exe:String):Bool
 	{
 		if (Sys.systemName() == "Windows")
 			return _exists(exe + ".exe") || _exists(exe + ".bat");
 		return _exists(exe);
 	}
-	
+
 	private function _exists(exe:String):Bool
 	{
 		try
@@ -129,7 +129,7 @@ class CSharpCompiler extends Compiler
 			return false;
 		}
 	}
-	
+
 	private function findMsvc()
 	{
 		//se if it is in path
@@ -138,20 +138,24 @@ class CSharpCompiler extends Compiler
 			this.path = "";
 			this.compiler = "csc";
 		}
-		
+
+#if neko
 		var is64:Bool = neko.Lib.load("std", "sys_is64", 0)();
+#else
+		var is64 = false;
+#end
 		var windir = Sys.getEnv("windir");
 		if (windir == null)
 			windir = "C:\\Windows";
 		var path = null;
-		
+
 		if (is64)
 		{
 			path = windir + "\\Microsoft.NET\\Framework64";
 		} else {
 			path = windir + "\\Microsoft.NET\\Framework";
 		}
-		
+
 		var foundVer:Null<Float> = null;
 		var foundPath = null;
 		if (FileSystem.exists(path))
@@ -162,7 +166,7 @@ class CSharpCompiler extends Compiler
 				if (regex.match(f))
 				{
 					var ver = Std.parseFloat(regex.matched(1));
-					if (ver != null && (foundVer == null || foundVer < ver))
+					if (!Math.isNaN(ver) && (foundVer == null || foundVer < ver))
 					{
 						if (FileSystem.exists((path + "/" + f + "/csc.exe")))
 						{
@@ -173,20 +177,20 @@ class CSharpCompiler extends Compiler
 				}
 			}
 		}
-		
+
 		if (foundPath != null)
 		{
 			this.path = foundPath + "/";
 			this.compiler = "csc";
 		}
 	}
-	
-	
-	
-	private function preProcess() 
+
+
+
+	private function preProcess()
 	{
 		//get requested version
-		var version = null;
+		var version:Null<Int> = null;
 		for (ver in [45,40,35,30,21,20])
 		{
 			if (data.defines.exists("NET_" + ver))
@@ -196,13 +200,13 @@ class CSharpCompiler extends Compiler
 			}
 		}
 		this.version = version;
-		
+
 		//get important defined vars
 		this.silverlight = data.defines.exists("silverlight");
 		this.dll = data.defines.exists("dll");
 		this.debug = data.defines.exists("debug");
 		this.unsafe = data.defines.exists("unsafe");
-		
+
 		//get name
 		var name = Sys.getCwd();
 		name = name.substr(0, name.length - 1);
@@ -211,5 +215,5 @@ class CSharpCompiler extends Compiler
 		else
 			this.name = name.split("/").pop();
 	}
-	
+
 }

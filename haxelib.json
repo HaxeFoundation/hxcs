@@ -1,0 +1,10 @@
+{
+	"name":"hxcs",
+	"url":"https://github.com/waneck/hxcs",
+	"license":"Public",
+	"tags":["cs","core"],
+	"description":"Support library for the C# backend of the Haxe compiler",
+	"version":"3.0.0-rc.1",
+	"releasenote":"Haxe 3.0 haxelib release",
+	"contributors":["waneck"]
+}
