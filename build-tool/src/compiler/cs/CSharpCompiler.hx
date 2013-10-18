@@ -11,6 +11,7 @@ class CSharpCompiler extends Compiler
 {
 	private var path:String;
 	private var compiler:String;
+	private var delim:String;
 
 	public var version(default, null):Null<Int>;
 	public var silverlight(default, null):Bool;
@@ -18,6 +19,7 @@ class CSharpCompiler extends Compiler
 	public var debug(default, null):Bool;
 	public var dll(default, null):Bool;
 	public var name(default, null):String;
+	public var libs(default, null):Array<{ name:String, hint:String }>;
 
 	public var data(default, null):Data;
 
@@ -30,7 +32,6 @@ class CSharpCompiler extends Compiler
 
 	override public function compile(data:Data):Void
 	{
-		var delim = Sys.systemName() == "Windows" ? "\\" : "/";
 		this.data = data;
 		preProcess();
 		if (!FileSystem.exists("bin"))
@@ -39,9 +40,18 @@ class CSharpCompiler extends Compiler
 		writeProject();
 
 
-		var args = ['/nologo', '/optimize' + (debug ? '-' : '+'), '/debug' + (debug ? '+' : '-'), '/unsafe' + (unsafe ? '+' : '-'), '/out:bin/' + this.name + "." + (dll ? "dll" : "exe"), '/target:' + (dll ? "library" : "exe") ];
-		if (data.main != null)
+		var args = ['/nologo',
+					'/optimize' + (debug ? '-' : '+'),
+					'/debug' + (debug ? '+' : '-'),
+					'/unsafe' + (unsafe ? '+' : '-'),
+					'/out:bin/' + this.name + "." + (dll ? "dll" : "exe"),
+					'/target:' + (dll ? "library" : "exe") ];
+		if (data.main != null && !dll)
 			args.push('/main:' + (data.main == "Main" ? "EntryPoint__Main" : data.main));
+		for (ref in libs) {
+			if (ref.hint != null)
+				args.push('/reference:${ref.hint}');
+		}
 		for (res in data.resources)
 			args.push('/res:src' + delim + 'Resources' + delim + res + ",src.Resources." + res);
 		for (file in data.modules)
@@ -185,10 +195,10 @@ class CSharpCompiler extends Compiler
 		}
 	}
 
-
-
 	private function preProcess()
 	{
+		delim = Sys.systemName() == "Windows" ? "\\" : "/";
+
 		//get requested version
 		var version:Null<Int> = null;
 		for (ver in [45,40,35,30,21,20])
@@ -206,6 +216,24 @@ class CSharpCompiler extends Compiler
 		this.dll = data.defines.exists("dll");
 		this.debug = data.defines.exists("debug");
 		this.unsafe = data.defines.exists("unsafe");
+		this.warn = data.defines.exists("warn");
+		this.verbose = data.defines.exists("verbose");
+
+		// massage the library names
+		this.libs = [];
+		for (lib in data.libs)
+		{
+			var parsed = {name: lib, hint: null};
+			if (lib.lastIndexOf(".dll") > 0)
+			{
+				parsed.hint = lib;
+				parsed.name = lib.split(delim).pop();
+				parsed.name = parsed.name.substring(0, parsed.name.lastIndexOf(".dll"));
+			}
+
+			this.libs.push(parsed);
+		}
+
 
 		//get name
 		var name = Sys.getCwd();

@@ -50,13 +50,15 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+  ::foreach refs::
+  ::if (hint != null)::
+    <Reference Include="::name::">
+       <HintPath>::hint::</HintPath>
+    </Reference>
+  ::else::
+    <Reference Include="::name::" />
+  ::end::
+  ::end::
   </ItemGroup>
   <ItemGroup>
 	::foreach srcs::

@@ -21,6 +21,7 @@ class CsProjWriter
 			name : compiler.name,
 			targetFramework : (compiler.version == null ? "3.5" : ( (compiler.version / 10) + "" )),
 			unsafe : compiler.unsafe,
+			refs : compiler.libs,
 			srcs : compiler.data.modules.map(function(m) return "src\\" + m.path.split(".").join("\\") + ".cs"),
 			res : compiler.data.resources.map(function(res) return "src\\Resources\\" + res)
 		} ));
