@@ -16,6 +16,8 @@ class CSharpCompiler extends Compiler
 	public var version(default, null):Null<Int>;
 	public var silverlight(default, null):Bool;
 	public var unsafe(default, null):Bool;
+	public var verbose(default, null):Bool;
+	public var warn(default, null):Bool;
 	public var debug(default, null):Bool;
 	public var dll(default, null):Bool;
 	public var name(default, null):String;
@@ -44,6 +46,7 @@ class CSharpCompiler extends Compiler
 					'/optimize' + (debug ? '-' : '+'),
 					'/debug' + (debug ? '+' : '-'),
 					'/unsafe' + (unsafe ? '+' : '-'),
+					'/warn:' + (warn ? '1' : '0'),
 					'/out:bin/' + this.name + "." + (dll ? "dll" : "exe"),
 					'/target:' + (dll ? "library" : "exe") ];
 		if (data.main != null && !dll)
@@ -60,7 +63,8 @@ class CSharpCompiler extends Compiler
 		var ret = 0;
 		try
 		{
-			Sys.println(this.path + this.compiler + " " + args.join(" "));
+			if (verbose)
+				Sys.println(this.path + this.compiler + " " + args.join(" "));
 			ret = Sys.command(this.path + this.compiler + (Sys.systemName() == "Windows" ? (this.compiler == "csc" ? ".exe" : ".bat") : ""), args);
 		}
 		catch (e:Dynamic)
