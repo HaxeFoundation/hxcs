@@ -240,12 +240,19 @@ class CSharpCompiler extends Compiler
 
 
 		//get name
-		var name = Sys.getCwd();
-		name = name.substr(0, name.length - 1);
-		if (name.lastIndexOf("\\") > name.lastIndexOf("/"))
-			this.name = name.split("\\").pop();
-		else
-			this.name = name.split("/").pop();
+    var name = data.main;
+    if (name == null)
+    {
+  		var name = Sys.getCwd();
+  		name = name.substr(0, name.length - 1);
+   		if (name.lastIndexOf("\\") > name.lastIndexOf("/"))
+   			name = name.split("\\").pop();
+  		else
+  			name = name.split("/").pop();
+    }
+    if (debug)
+      name += "-Debug";
+    this.name = name;
 	}
 
 }
