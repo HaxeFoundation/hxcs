@@ -1,3 +1,3 @@
 [submodule "build-tool/base"]
 	path = build-tool/base
-	url = git@github.com:waneck/build-tool-base.git
+	url = https://github.com/waneck/build-tool-base.git
