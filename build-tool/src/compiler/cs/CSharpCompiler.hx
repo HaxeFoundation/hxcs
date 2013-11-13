@@ -239,9 +239,17 @@ class CSharpCompiler extends Compiler
 		}
 
 
-		//get name
-    var name = data.main;
-    if (name == null)
+	// get name from main class if there's one
+	// or from output directory name if there's none
+    var name = if (data.main != null)
+    {
+    	var idx = data.main.lastIndexOf(".");
+    	if (idx != -1)
+    		data.main.substr(idx + 1);
+		else
+			data.main;
+    }
+    else
     {
   		var name = Sys.getCwd();
   		name = name.substr(0, name.length - 1);
