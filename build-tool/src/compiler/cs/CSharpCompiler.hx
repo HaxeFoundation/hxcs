@@ -100,19 +100,18 @@ class CSharpCompiler extends Compiler
 		if (path == null)
 		{
 			//look for mono
-			if (exists("mcs"))
-			{
-				this.path = "";
-				this.compiler = "mcs";
-			} else if ((version == null || version <= 20) && exists("gmcs")) {
+			if ((version == null || version <= 20) && exists("gmcs")) {
 				this.path = "";
 				this.compiler = "gmcs";
 			} else if ((version == null || version <= 21 && silverlight) && exists("smcs")) {
 				this.path = "";
 				this.compiler = "smcs";
-			} else if (exists("dmcs")) {
+			} else if ((version == null || version <= 40) && exists("dmcs")) {
 				this.path = "";
 				this.compiler = "dmcs";
+			} else if (exists("mcs")) {
+				this.path = "";
+				this.compiler = "mcs";
 			}
 		}
 
