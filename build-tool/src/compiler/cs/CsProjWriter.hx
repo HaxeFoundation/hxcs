@@ -15,11 +15,15 @@ class CsProjWriter
 	
 	public function write(compiler:CSharpCompiler):Void
 	{
+		var versionStr : String = (compiler.version == null ? "3.5" : Std.string(compiler.version / 10));
+		if (versionStr.indexOf(".") < 0) {
+			versionStr += ".0";
+		}
 		var template = new Template( Resource.getString("csproj-template.mtt") );
 		stream.writeString(template.execute( { 
 			outputType : (compiler.dll ? "Dll" : "Exe"),
 			name : compiler.name,
-			targetFramework : (compiler.version == null ? "3.5" : ( (compiler.version / 10) + "" )),
+			targetFramework : versionStr,
 			unsafe : compiler.unsafe,
 			refs : compiler.libs,
 			srcs : compiler.data.modules.map(function(m) return "src\\" + m.path.split(".").join("\\") + ".cs"),
