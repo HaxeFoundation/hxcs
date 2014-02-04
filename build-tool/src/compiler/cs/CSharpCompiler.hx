@@ -49,8 +49,12 @@ class CSharpCompiler extends Compiler
 					'/warn:' + (warn ? '1' : '0'),
 					'/out:bin/' + this.name + "." + (dll ? "dll" : "exe"),
 					'/target:' + (dll ? "library" : "exe") ];
-		if (data.main != null && !dll)
-			args.push('/main:' + (data.main == "Main" ? "EntryPoint__Main" : data.main));
+		if (data.main != null && !dll) {
+			var idx = data.main.lastIndexOf(".");
+			var namespace = data.main.substring(0, idx + 1);
+			var main = data.main.substring(idx + 1);
+			args.push('/main:' + namespace + (main == "Main" ? "EntryPoint__Main" : main));
+		}
 		for (ref in libs) {
 			if (ref.hint != null)
 				args.push('/reference:${ref.hint}');
