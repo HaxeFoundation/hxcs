@@ -42,13 +42,14 @@ class CSharpCompiler extends Compiler
 		findCompiler();
 		writeProject();
 
-
+		var output = cmd.output == null ? 'bin/' + this.name : Tools.addPath(data.baseDir, cmd.output),
+				outDir = haxe.io.Path.directory(output);
 		var args = ['/nologo',
 					'/optimize' + (debug ? '-' : '+'),
 					'/debug' + (debug ? '+' : '-'),
 					'/unsafe' + (unsafe ? '+' : '-'),
 					'/warn:' + (warn ? '1' : '0'),
-					'/out:bin/' + this.name + "." + (dll ? "dll" : "exe"),
+					'/out:' + output + "." + (dll ? "dll" : "exe"),
 					'/target:' + (dll ? "library" : "exe") ];
 		if (data.main != null && !dll) {
 			var idx = data.main.lastIndexOf(".");
@@ -56,9 +57,16 @@ class CSharpCompiler extends Compiler
 			var main = data.main.substring(idx + 1);
 			args.push('/main:' + namespace + (main == "Main" ? "EntryPoint__Main" : main));
 		}
-		for (ref in libs) {
+		for (ref in libs)
+		{
 			if (ref.hint != null)
-				args.push('/reference:${Tools.addPath(data.baseDir, ref.hint)}');
+			{
+				var fullpath = Tools.addPath(data.baseDir,ref.hint),
+				    mypath = Tools.addPath(outDir, haxe.io.Path.withoutDirectory(ref.hint));
+				Tools.copyIfNewer(fullpath, mypath);
+
+				args.push('/reference:$mypath');
+			}
 		}
 		for (res in data.resources)
 			args.push('/res:src' + delim + 'Resources' + delim + res + ",src.Resources." + res);
