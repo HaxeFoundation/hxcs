@@ -58,7 +58,7 @@ class CSharpCompiler extends Compiler
 		}
 		for (ref in libs) {
 			if (ref.hint != null)
-				args.push('/reference:${ref.hint}');
+				args.push('/reference:${Tools.addPath(data.baseDir, ref.hint)}');
 		}
 		for (res in data.resources)
 			args.push('/res:src' + delim + 'Resources' + delim + res + ",src.Resources." + res);
