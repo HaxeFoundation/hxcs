@@ -6,6 +6,7 @@ import input.Data;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.Process;
+using StringTools;
 
 class CSharpCompiler extends Compiler
 {
@@ -50,7 +51,7 @@ class CSharpCompiler extends Compiler
 					'/out:bin/' + this.name + "." + (dll ? "dll" : "exe"),
 					'/target:' + (dll ? "library" : "exe") ];
 		if (data.main != null && !dll)
-			args.push('/main:' + (data.main == "Main" ? "EntryPoint__Main" : data.main));
+			args.push('/main:' + (data.main.endsWith("Main") ? (data.main.substr(0,-4) + "EntryPoint__Main") : data.main));
 		for (ref in libs) {
 			if (ref.hint != null)
 				args.push('/reference:${ref.hint}');
