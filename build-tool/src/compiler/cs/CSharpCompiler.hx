@@ -135,20 +135,21 @@ class CSharpCompiler extends Compiler
 		}
 	}
 
-	private function exists(exe:String):Bool
+	private function exists(exe:String, checkArgs:Array<String> = null):Bool
 	{
-		if (Sys.systemName() == "Windows")
-			return _exists(exe + ".exe") || _exists(exe + ".bat");
-		return _exists(exe);
+		if (checkArgs == null) checkArgs = ["-help"];
+
+		return if (Sys.systemName() == "Windows")
+			_exists(exe + ".exe", checkArgs) || _exists(exe + ".bat", checkArgs);
+		else
+			_exists(exe, checkArgs);
 	}
 
-	private function _exists(exe:String):Bool
+	private function _exists(exe:String, checkArgs:Array<String>):Bool
 	{
 		try
 		{
-			var cmd = new Process(exe, []);
-			cmd.exitCode();
-			return true;
+			return new Process(exe, checkArgs).exitCode() == 0;
 		}
 		catch (e:Dynamic)
 		{
