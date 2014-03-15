@@ -4,7 +4,7 @@
 	"license":"Public",
 	"tags":["cs","core"],
 	"description":"Support library for the C# backend of the Haxe compiler",
-	"version":"3.1.0",
-	"releasenote":"Haxe 3.1 haxelib release - -net-lib support files",
+	"version":"3.1.1",
+	"releasenote":"Support files for .NET 4.0",
 	"contributors":["waneck"]
 }
