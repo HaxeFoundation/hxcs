@@ -76,6 +76,12 @@ class CSharpCompiler extends Compiler
 		var ret = 0;
 		try
 		{
+			if (Sys.systemName() == "Windows" && !data.defines.exists("LONG_COMMAND_LINE"))
+			{
+				//save in a file
+				sys.io.File.saveContent('cmd',args.join('\n'));
+				args = ['@cmd'];
+			}
 			if (verbose)
 				Sys.println(this.path + this.compiler + " " + args.join(" "));
 			ret = Sys.command(this.path + this.compiler + (Sys.systemName() == "Windows" ? (this.compiler == "csc" ? ".exe" : ".bat") : ""), args);
