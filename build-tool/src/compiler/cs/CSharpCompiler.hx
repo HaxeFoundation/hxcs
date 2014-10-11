@@ -33,6 +33,11 @@ class CSharpCompiler extends Compiler
 		this.cmd = cmd;
 	}
 
+	private function log(str:String,?pos:haxe.PosInfos)
+	{
+		if (this.verbose) haxe.Log.trace(str,pos);
+	}
+
 	override public function compile(data:Data):Void
 	{
 		this.data = data;
@@ -51,6 +56,7 @@ class CSharpCompiler extends Compiler
 					'/warn:' + (warn ? '1' : '0'),
 					'/out:' + output + "." + (dll ? "dll" : "exe"),
 					'/target:' + (dll ? "library" : "exe") ];
+		log('preparing cmd arguments:  ${args.join(" ")}');
 		if (data.main != null && !dll) {
 			var idx = data.main.lastIndexOf(".");
 			var namespace = data.main.substring(0, idx + 1);
@@ -73,6 +79,7 @@ class CSharpCompiler extends Compiler
 		for (file in data.modules)
 			args.push("src" + delim + file.path.split(".").join(delim) + ".cs");
 
+		log('cmd arguments:  ${args.join(" ")}');
 		var ret = 0;
 		try
 		{
@@ -97,6 +104,7 @@ class CSharpCompiler extends Compiler
 
 	private function writeProject()
 	{
+		log('writing csproj');
 		var bytes = new BytesOutput();
 		new CsProjWriter(bytes).write(this);
 
@@ -112,6 +120,7 @@ class CSharpCompiler extends Compiler
 
 	private function findCompiler()
 	{
+		log('finding compiler...');
 		//if windows look first for MSVC toolchain
 		if (Sys.systemName() == "Windows")
 			findMsvc();
@@ -122,18 +131,23 @@ class CSharpCompiler extends Compiler
 			if ((version == null || version <= 20) && exists("gmcs")) {
 				this.path = "";
 				this.compiler = "gmcs";
+				log('Found mono compiler: gmcs');
 			} else if ((version == null || version <= 21 && silverlight) && exists("smcs")) {
 				this.path = "";
 				this.compiler = "smcs";
+				log('Found mono compiler: smcs');
 			} else if ((version == null || version <= 40) && exists("dmcs")) {
 				this.path = "";
 				this.compiler = "dmcs";
+				log('Found mono compiler: dmcs');
 			} else if (exists("mcs")) {
 				this.path = "";
 				this.compiler = "mcs";
+				log('Found mono compiler: mcs');
 			}
 		}
 
+		log('Compiler path: $path ; Compiler: $compiler');
 		if (path == null)
 		{
 			//TODO look for mono path
@@ -165,11 +179,13 @@ class CSharpCompiler extends Compiler
 
 	private function findMsvc()
 	{
+		log('looking for MSVC directory');
 		//se if it is in path
 		if (exists("csc"))
 		{
 			this.path = "";
 			this.compiler = "csc";
+			log('found csc compiler');
 		}
 
 #if neko
@@ -180,6 +196,7 @@ class CSharpCompiler extends Compiler
 		var windir = Sys.getEnv("windir");
 		if (windir == null)
 			windir = "C:\\Windows";
+		log('WINDIR: ${windir} (${Sys.getEnv('windir')})');
 		var path = null;
 
 		if (is64)
@@ -188,6 +205,7 @@ class CSharpCompiler extends Compiler
 		} else {
 			path = windir + "\\Microsoft.NET\\Framework";
 		}
+		log('looking up framework at ' + path);
 
 		var foundVer:Null<Float> = null;
 		var foundPath = null;
@@ -199,10 +217,12 @@ class CSharpCompiler extends Compiler
 				if (regex.match(f))
 				{
 					var ver = Std.parseFloat(regex.matched(1));
+					log('found framework: $f (ver $ver)');
 					if (!Math.isNaN(ver) && (foundVer == null || foundVer < ver))
 					{
 						if (FileSystem.exists((path + "/" + f + "/csc.exe")))
 						{
+							log('found path:$path/$f/csc.exe');
 							foundPath = path + '/' + f;
 							foundVer = ver;
 						}
