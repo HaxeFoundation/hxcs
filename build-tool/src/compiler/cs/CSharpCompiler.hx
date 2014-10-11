@@ -188,54 +188,46 @@ class CSharpCompiler extends Compiler
 			log('found csc compiler');
 		}
 
-#if neko
-		var is64:Bool = neko.Lib.load("std", "sys_is64", 0)();
-#else
-		var is64 = false;
-#end
 		var windir = Sys.getEnv("windir");
 		if (windir == null)
 			windir = "C:\\Windows";
 		log('WINDIR: ${windir} (${Sys.getEnv('windir')})');
 		var path = null;
 
-		if (is64)
+		for (path in [windir+"\\Microsoft.NET\\Framework64", windir+"\\Microsoft.NET\\Framework"])
 		{
-			path = windir + "\\Microsoft.NET\\Framework64";
-		} else {
-			path = windir + "\\Microsoft.NET\\Framework";
-		}
-		log('looking up framework at ' + path);
+			log('looking up framework at ' + path);
 
-		var foundVer:Null<Float> = null;
-		var foundPath = null;
-		if (FileSystem.exists(path))
-		{
-			var regex = ~/v(\d+.\d+)/;
-			for (f in FileSystem.readDirectory(path))
+			var foundVer:Null<Float> = null;
+			var foundPath = null;
+			if (FileSystem.exists(path))
 			{
-				if (regex.match(f))
+				var regex = ~/v(\d+.\d+)/;
+				for (f in FileSystem.readDirectory(path))
 				{
-					var ver = Std.parseFloat(regex.matched(1));
-					log('found framework: $f (ver $ver)');
-					if (!Math.isNaN(ver) && (foundVer == null || foundVer < ver))
+					if (regex.match(f))
 					{
-						if (FileSystem.exists((path + "/" + f + "/csc.exe")))
+						var ver = Std.parseFloat(regex.matched(1));
+						log('found framework: $f (ver $ver)');
+						if (!Math.isNaN(ver) && (foundVer == null || foundVer < ver))
 						{
-							log('found path:$path/$f/csc.exe');
-							foundPath = path + '/' + f;
-							foundVer = ver;
+							if (FileSystem.exists((path + "/" + f + "/csc.exe")))
+							{
+								log('found path:$path/$f/csc.exe');
+								foundPath = path + '/' + f;
+								foundVer = ver;
+							}
 						}
 					}
 				}
 			}
+			if (foundPath != null)
+			{
+				this.path = foundPath + "/";
+				this.compiler = "csc";
+			}
 		}
 
-		if (foundPath != null)
-		{
-			this.path = foundPath + "/";
-			this.compiler = "csc";
-		}
 	}
 
 	private function preProcess()
