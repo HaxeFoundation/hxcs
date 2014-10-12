@@ -169,7 +169,9 @@ class CSharpCompiler extends Compiler
 	{
 		try
 		{
-			return new Process(exe, checkArgs).exitCode() == 0;
+			var ret = new Process(exe, checkArgs);
+			ret.stdout.readAll();
+			return ret.exitCode() == 0;
 		}
 		catch (e:Dynamic)
 		{
