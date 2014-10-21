@@ -23,6 +23,7 @@ class CSharpCompiler extends Compiler
 	public var dll(default, null):Bool;
 	public var name(default, null):String;
 	public var libs(default, null):Array<{ name:String, hint:String }>;
+	public var csharpCompiler(default, null):Null<String>;	
 
 	public var data(default, null):Data;
 
@@ -120,30 +121,38 @@ class CSharpCompiler extends Compiler
 
 	private function findCompiler()
 	{
-		log('finding compiler...');
-		//if windows look first for MSVC toolchain
-		if (Sys.systemName() == "Windows")
-			findMsvc();
+		if (csharpCompiler == null) {
+		  log('finding compiler...');
+		  //if windows look first for MSVC toolchain
+		  if (Sys.systemName() == "Windows")
+		  	findMsvc();
 
-		if (path == null)
-		{
-			//look for mono
-			if ((version == null || version <= 20) && exists("gmcs")) {
+		  if (path == null)
+		  {
+		  	//look for mono
+		  	if ((version == null || version <= 20) && exists("gmcs")) {
+		  		this.path = "";
+		  		this.compiler = "gmcs";
+		  		log('Found mono compiler: gmcs');
+		  	} else if ((version == null || version <= 21 && silverlight) && exists("smcs")) {
+		  		this.path = "";
+		  		this.compiler = "smcs";
+		  		log('Found mono compiler: smcs');
+		  	} else if ((version == null || version <= 40) && exists("dmcs")) {
+		  		this.path = "";
+		  		this.compiler = "dmcs";
+		  		log('Found mono compiler: dmcs');
+		  	} else if (exists("mcs")) {
+		  		this.path = "";
+		  		this.compiler = "mcs";
+		  		log('Found mono compiler: mcs');
+		  	}
+		  }
+		} else {
+		  if (exists(this.csharpCompiler))
+			{
 				this.path = "";
-				this.compiler = "gmcs";
-				log('Found mono compiler: gmcs');
-			} else if ((version == null || version <= 21 && silverlight) && exists("smcs")) {
-				this.path = "";
-				this.compiler = "smcs";
-				log('Found mono compiler: smcs');
-			} else if ((version == null || version <= 40) && exists("dmcs")) {
-				this.path = "";
-				this.compiler = "dmcs";
-				log('Found mono compiler: dmcs');
-			} else if (exists("mcs")) {
-				this.path = "";
-				this.compiler = "mcs";
-				log('Found mono compiler: mcs');
+				this.compiler = this.csharpCompiler;
 			}
 		}
 
@@ -151,7 +160,7 @@ class CSharpCompiler extends Compiler
 		if (path == null)
 		{
 			//TODO look for mono path
-			throw Error.CompilerNotFound;
+		 	throw Error.CompilerNotFound;
 		}
 	}
 
@@ -247,6 +256,17 @@ class CSharpCompiler extends Compiler
 			}
 		}
 		this.version = version;
+
+		// get requested csharp compiler
+		var csharpCompiler:Null<String> = null;
+		for (c in ["csc", "gmcs", "smcs", "dmcs", "mcs"])
+		{
+		  if (data.defines.exists("CSHARP_COMPILER_" + c))
+		  {
+				this.csharpCompiler = c;
+				break;
+		  }
+		}
 
 		//get important defined vars
 		this.silverlight = data.defines.exists("silverlight");
