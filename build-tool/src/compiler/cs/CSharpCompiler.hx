@@ -258,7 +258,7 @@ class CSharpCompiler extends Compiler
 		this.version = version;
 
 		// get requested csharp compiler
-		this.csharpCompiler = data.definesData.get("csharp_compiler");
+		this.csharpCompiler = data.definesData.get("csharp-compiler");
 
 		//get important defined vars
 		this.silverlight = data.defines.exists("silverlight");
