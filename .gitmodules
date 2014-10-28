@@ -1,3 +1,3 @@
 [submodule "build-tool/base"]
 	path = build-tool/base
-	url = https://github.com/qifun/build-tool-base.git
+	url = https://github.com/waneck/build-tool-base.git
