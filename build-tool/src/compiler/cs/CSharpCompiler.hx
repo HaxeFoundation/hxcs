@@ -23,7 +23,7 @@ class CSharpCompiler extends Compiler
 	public var dll(default, null):Bool;
 	public var name(default, null):String;
 	public var libs(default, null):Array<{ name:String, hint:String }>;
-	public var csharpCompiler(default, null):Null<String>;	
+	public var csharpCompiler(default, null):Null<String>;
 
 	public var data(default, null):Data;
 
@@ -258,15 +258,7 @@ class CSharpCompiler extends Compiler
 		this.version = version;
 
 		// get requested csharp compiler
-		var csharpCompiler:Null<String> = null;
-		for (c in ["csc", "gmcs", "smcs", "dmcs", "mcs"])
-		{
-		  if (data.defines.exists("CSHARP_COMPILER_" + c))
-		  {
-				this.csharpCompiler = c;
-				break;
-		  }
-		}
+		this.csharpCompiler = data.definesData.get("csharp-compiler");
 
 		//get important defined vars
 		this.silverlight = data.defines.exists("silverlight");
