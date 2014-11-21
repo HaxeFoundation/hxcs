@@ -24,6 +24,7 @@ class CSharpCompiler extends Compiler
 	public var name(default, null):String;
 	public var libs(default, null):Array<{ name:String, hint:String }>;
 	public var csharpCompiler(default, null):Null<String>;
+	public var arch(default,null):Null<String>;
 
 	public var data(default, null):Data;
 
@@ -57,6 +58,8 @@ class CSharpCompiler extends Compiler
 					'/warn:' + (warn ? '1' : '0'),
 					'/out:' + output + "." + (dll ? "dll" : "exe"),
 					'/target:' + (dll ? "library" : "exe") ];
+		if(this.arch != null)
+			args.push('/platform:${this.arch}');
 		log('preparing cmd arguments:  ${args.join(" ")}');
 		if (data.main != null && !dll) {
 			var idx = data.main.lastIndexOf(".");
@@ -267,6 +270,7 @@ class CSharpCompiler extends Compiler
 		this.unsafe = data.defines.exists("unsafe");
 		this.warn = data.defines.exists("warn");
 		this.verbose = data.defines.exists("verbose");
+		this.arch = data.definesData.get('arch');
 
 		// massage the library names
 		this.libs = [];
