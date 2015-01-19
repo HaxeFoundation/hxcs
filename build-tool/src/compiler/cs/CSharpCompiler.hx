@@ -83,6 +83,9 @@ class CSharpCompiler extends Compiler
 		for (file in data.modules)
 			args.push("src" + delim + file.path.split(".").join(delim) + ".cs");
 
+		for (opt in data.opts)
+			args.push(opt);
+
 		log('cmd arguments:  ${args.join(" ")}');
 		var ret = 0;
 		try
