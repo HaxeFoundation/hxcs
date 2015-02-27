@@ -78,8 +78,10 @@ class CSharpCompiler extends Compiler
 				args.push('/reference:$mypath');
 			}
 		}
-		for (res in data.resources)
+		for (res in data.resources) {
+			res = haxe.crypto.Base64.encode(haxe.io.Bytes.ofString(res));
 			args.push('/res:src' + delim + 'Resources' + delim + res + ",src.Resources." + res);
+		}
 		for (file in data.modules)
 			args.push("src" + delim + file.path.split(".").join(delim) + ".cs");
 
