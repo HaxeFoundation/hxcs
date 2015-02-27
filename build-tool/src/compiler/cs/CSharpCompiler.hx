@@ -79,7 +79,8 @@ class CSharpCompiler extends Compiler
 			}
 		}
 		for (res in data.resources) {
-			res = haxe.crypto.Base64.encode(haxe.io.Bytes.ofString(res));
+			res = escapeRes(res);
+			// res = haxe.crypto.Base64.encode(haxe.io.Bytes.ofString(res));
 			args.push('/res:src' + delim + 'Resources' + delim + res + ",src.Resources." + res);
 		}
 		for (file in data.modules)
@@ -109,6 +110,12 @@ class CSharpCompiler extends Compiler
 
 		if (ret != 0)
 			throw Error.BuildFailed;
+	}
+
+	private static function escapeRes(name:String)
+	{
+		var regex = ~/[^A-Za-z0-9_\/]/g;
+		return regex.map(name, function(v) return '-x' + v.matched(0).charCodeAt(0));
 	}
 
 	private function writeProject()
