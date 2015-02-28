@@ -40,6 +40,7 @@ class CSharpCompiler extends Compiler
 		if (this.verbose) haxe.Log.trace(str,pos);
 	}
 
+	@:access(haxe.io.Path.escape)
 	override public function compile(data:Data):Void
 	{
 		this.data = data;
@@ -79,7 +80,7 @@ class CSharpCompiler extends Compiler
 			}
 		}
 		for (res in data.resources) {
-			res = escapeRes(res);
+			res = haxe.io.Path.escape(res, true);
 			// res = haxe.crypto.Base64.encode(haxe.io.Bytes.ofString(res));
 			args.push('/res:src' + delim + 'Resources' + delim + res + ",src.Resources." + res);
 		}
@@ -110,12 +111,6 @@ class CSharpCompiler extends Compiler
 
 		if (ret != 0)
 			throw Error.BuildFailed;
-	}
-
-	private static function escapeRes(name:String)
-	{
-		var regex = ~/[^A-Za-z0-9_\/]/g;
-		return regex.map(name, function(v) return '-x' + v.matched(0).charCodeAt(0));
 	}
 
 	private function writeProject()
