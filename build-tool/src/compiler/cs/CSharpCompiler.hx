@@ -272,7 +272,7 @@ class CSharpCompiler extends Compiler
 
 		//get important defined vars
 		this.silverlight = data.defines.exists("silverlight");
-		this.dll = data.defines.exists("dll");
+		this.dll = data.defines.exists("dll") || data.main == null;
 		this.debug = data.defines.exists("debug");
 		this.unsafe = data.defines.exists("unsafe");
 		this.warn = data.defines.exists("warn");
