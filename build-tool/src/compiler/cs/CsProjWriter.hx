@@ -21,7 +21,7 @@ class CsProjWriter
 		}
 		var template = new Template( Resource.getString("csproj-template.mtt") );
 		stream.writeString(template.execute( {
-			outputType : (compiler.dll ? "Dll" : "Exe"),
+			outputType : (compiler.dll ? "Library" : "Exe"),
 			name : compiler.name,
 			targetFramework : versionStr,
 			unsafe : compiler.unsafe,
