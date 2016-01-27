@@ -161,8 +161,9 @@ class CSharpCompiler extends Compiler
 		} else {
 		  if (exists(this.csharpCompiler))
 			{
-				this.path = "";
-				this.compiler = this.csharpCompiler;
+				var index = this.csharpCompiler.lastIndexOf( this.delim ) + 1;
+				this.path = this.csharpCompiler.substr( 0, index );
+				this.compiler = this.csharpCompiler.substr( index );
 			}
 		}
 
