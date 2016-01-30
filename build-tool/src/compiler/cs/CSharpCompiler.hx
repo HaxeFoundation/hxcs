@@ -230,6 +230,7 @@ class CSharpCompiler extends Compiler
 					if (regex.match(f))
 					{
 						var ver = Std.parseFloat(regex.matched(1));
+						var netver = Std.parseInt(regex.matched(1).replace('.', ''));
 						log('found framework: $f (ver $ver)');
 						if (!Math.isNaN(ver) && (foundVer == null || foundVer < ver))
 						{
@@ -238,6 +239,7 @@ class CSharpCompiler extends Compiler
 								log('found path:$path/$f/csc.exe');
 								foundPath = path + '/' + f;
 								foundVer = ver;
+								if (netver == version) break;
 							}
 						}
 					}
