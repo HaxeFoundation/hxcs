@@ -4,7 +4,7 @@
 	"license":"Public",
 	"tags":["cs","core"],
 	"description":"Support library for the C# backend of the Haxe compiler",
-	"version":"3.2.0",
-	"releasenote":"Update to Haxe 3.2 release and introduced --feature-level and extra compiler flags",
+	"version":"3.4.0",
+	"releasenote":"Add net-lib 4.5 support",
 	"contributors":["waneck"]
 }
