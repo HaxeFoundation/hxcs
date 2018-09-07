@@ -139,24 +139,30 @@ class CSharpCompiler extends Compiler
 
 		  if (path == null)
 		  {
-		  	//look for mono
-		  	if ((version == null || version <= 20) && exists("gmcs")) {
-		  		this.path = "";
-		  		this.compiler = "gmcs";
-		  		log('Found mono compiler: gmcs');
-		  	} else if ((version == null || version <= 21 && silverlight) && exists("smcs")) {
-		  		this.path = "";
-		  		this.compiler = "smcs";
-		  		log('Found mono compiler: smcs');
-		  	} else if ((version == null || version <= 40) && exists("dmcs")) {
-		  		this.path = "";
-		  		this.compiler = "dmcs";
-		  		log('Found mono compiler: dmcs');
-		  	} else if (exists("mcs")) {
-		  		this.path = "";
-		  		this.compiler = "mcs";
-		  		log('Found mono compiler: mcs');
-		  	}
+			//look for a suitable mono compiler, see http://www.mono-project.com/docs/about-mono/languages/csharp/
+			var compiler:String = null;
+			if (version == null)
+			{
+				// if no version was specified try to find the newest compiler
+				if (exists("mcs")) compiler = "mcs";
+				else if (exists("dmcs")) compiler = "dmcs";
+				else if (silverlight && exists("smcs")) compiler = "smcs";
+				else if (exists("gmcs")) compiler = "gmcs";
+			} 
+			else
+			{
+				// if a version was specified try to find the best matching
+				if (version <= 20 && exists("gmcs")) compiler = "gmcs";
+				else if (version <= 21 && silverlight && exists("smcs")) compiler = "smcs";
+				else if (version <= 40 && exists("dmcs")) compiler = "dmcs";
+				else if (exists("mcs")) compiler = "mcs";
+			}
+			if (compiler != null)
+			{
+				this.path = "";
+				this.compiler = compiler;
+				log('Found mono compiler: $compiler for version: $version');
+			}
 		  }
 		} else {
 		  if (exists(this.csharpCompiler))
