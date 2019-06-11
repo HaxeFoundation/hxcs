@@ -3,8 +3,8 @@
 	"url":"https://github.com/HaxeFoundation/hxcs",
 	"license":"Public",
 	"tags":["cs","core"],
-	"description":"Support library for the C# backend of the Haxe compiler",
-	"version":"3.4.0",
+	"description":".NET core libs",
+	"version":"4.0.0-alpha",
 	"releasenote":"Add net-lib 4.5 support",
-	"contributors":["waneck"]
+	"contributors":["waneck", "HaxeFoundation"]
 }
