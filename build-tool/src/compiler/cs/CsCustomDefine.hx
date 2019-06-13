@@ -12,23 +12,23 @@ package compiler.cs;
 
 		If not defined, defaults to 'anycpu'.
 	**/
-	var ARCH = 'arch';
+	var Arch = 'arch';
 
 	/**
 		Sets warning level (0-4).
 		The default is 0, or 1 if the define is set with no value.
 	**/
-	var WARN = 'warn';
+	var Warn = 'warn';
 
 	/**
 		Specify the C# compiler to use (mcs, dmcs, smcs, gmcs, etc.).
 	**/
-	var CSHARP_COMPILER = 'csharp-compiler';
+	var CSharpCompiler = 'csharp-compiler';
 
 	/**
 		If set, will consider smcs as a potential C# compiler.
 	**/
-	var SILVERLIGHT = 'silverlight';
+	var Silverlight = 'silverlight';
 
 	/**
 		Windows only.
@@ -36,7 +36,7 @@ package compiler.cs;
 		If not defined, will generate a file containing the build arguments and
 		use it to pass arguments to the C# compiler.
 	**/
-	var LONG_COMMAND_LINE = 'LONG_COMMAND_LINE';
+	var LongCommandLine = 'LONG_COMMAND_LINE';
 
 	public function withNamespace():String return 'hxcs.$this';
 }

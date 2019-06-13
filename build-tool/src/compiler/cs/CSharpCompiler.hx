@@ -94,7 +94,7 @@ class CSharpCompiler extends Compiler
 		var ret = 0;
 		try
 		{
-			if (Sys.systemName() == "Windows" && !hasDefine(data, LONG_COMMAND_LINE))
+			if (Sys.systemName() == "Windows" && !hasDefine(data, LongCommandLine))
 			{
 				//save in a file
 				sys.io.File.saveContent('cmd',args.join('\n'));
@@ -273,13 +273,13 @@ class CSharpCompiler extends Compiler
 		this.version = version;
 
 		// get requested csharp compiler
-		this.csharpCompiler = getDefine(data, CSHARP_COMPILER);
+		this.csharpCompiler = getDefine(data, CSharpCompiler);
 
 		//get important defined vars
-		this.silverlight = hasDefine(data, SILVERLIGHT);
+		this.silverlight = hasDefine(data, Silverlight);
 		this.dll = hasDefine(data, DLL) || data.main == null;
 		this.warn = getWarningLevel(data);
-		this.arch = getDefine(data, ARCH);
+		this.arch = getDefine(data, Arch);
 		this.unsafe = data.defines.exists("unsafe");
 		this.debug = data.defines.exists("debug");
 		this.verbose = data.defines.exists("verbose");
@@ -327,8 +327,8 @@ class CSharpCompiler extends Compiler
 
 	private function getWarningLevel(data:Data):Int
 	{
-		if (!hasDefine(data, WARN)) return 0;
-		var warnDefine = getDefine(data, WARN);
+		if (!hasDefine(data, Warn)) return 0;
+		var warnDefine = getDefine(data, Warn);
 		if (warnDefine == "") return 1;
 		return Std.parseInt(warnDefine);
 	}
