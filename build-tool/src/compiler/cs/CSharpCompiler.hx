@@ -18,7 +18,7 @@ class CSharpCompiler extends Compiler
 	public var silverlight(default, null):Bool;
 	public var unsafe(default, null):Bool;
 	public var verbose(default, null):Bool;
-	public var warn(default, null):Bool;
+	public var warn(default, null):Int;
 	public var debug(default, null):Bool;
 	public var dll(default, null):Bool;
 	public var name(default, null):String;
@@ -56,7 +56,7 @@ class CSharpCompiler extends Compiler
 					'/optimize' + (debug ? '-' : '+'),
 					'/debug' + (debug ? '+' : '-'),
 					'/unsafe' + (unsafe ? '+' : '-'),
-					'/warn:' + (warn ? '1' : '0'),
+					'/warn:' + Std.string(warn),
 					'/out:' + output + "." + (dll ? "dll" : "exe"),
 					'/target:' + (dll ? "library" : "exe") ];
 		if(this.arch != null)
@@ -73,7 +73,7 @@ class CSharpCompiler extends Compiler
 			if (ref.hint != null)
 			{
 				var fullpath = Tools.addPath(data.baseDir,ref.hint),
-				    mypath = Tools.addPath(outDir, haxe.io.Path.withoutDirectory(ref.hint));
+					mypath = Tools.addPath(outDir, haxe.io.Path.withoutDirectory(ref.hint));
 				Tools.copyIfNewer(fullpath, mypath);
 
 				args.push('/reference:$mypath');
@@ -94,7 +94,7 @@ class CSharpCompiler extends Compiler
 		var ret = 0;
 		try
 		{
-			if (Sys.systemName() == "Windows" && !data.defines.exists("LONG_COMMAND_LINE"))
+			if (Sys.systemName() == "Windows" && !hasDefine(data, LONG_COMMAND_LINE))
 			{
 				//save in a file
 				sys.io.File.saveContent('cmd',args.join('\n'));
@@ -132,40 +132,40 @@ class CSharpCompiler extends Compiler
 	private function findCompiler()
 	{
 		if (csharpCompiler == null) {
-		  log('finding compiler...');
-		  //if windows look first for MSVC toolchain
-		  if (Sys.systemName() == "Windows")
-		  	findMsvc();
+			log('finding compiler...');
+			//if windows look first for MSVC toolchain
+			if (Sys.systemName() == "Windows")
+				findMsvc();
 
-		  if (path == null)
-		  {
-			//look for a suitable mono compiler, see http://www.mono-project.com/docs/about-mono/languages/csharp/
-			var compiler:String = null;
-			if (version == null)
+			if (path == null)
 			{
-				// if no version was specified try to find the newest compiler
-				if (exists("mcs")) compiler = "mcs";
-				else if (exists("dmcs")) compiler = "dmcs";
-				else if (silverlight && exists("smcs")) compiler = "smcs";
-				else if (exists("gmcs")) compiler = "gmcs";
-			} 
-			else
-			{
-				// if a version was specified try to find the best matching
-				if (version <= 20 && exists("gmcs")) compiler = "gmcs";
-				else if (version <= 21 && silverlight && exists("smcs")) compiler = "smcs";
-				else if (version <= 40 && exists("dmcs")) compiler = "dmcs";
-				else if (exists("mcs")) compiler = "mcs";
+				//look for a suitable mono compiler, see http://www.mono-project.com/docs/about-mono/languages/csharp/
+				var compiler:String = null;
+				if (version == null)
+				{
+					// if no version was specified try to find the newest compiler
+					if (exists("mcs")) compiler = "mcs";
+					else if (exists("dmcs")) compiler = "dmcs";
+					else if (silverlight && exists("smcs")) compiler = "smcs";
+					else if (exists("gmcs")) compiler = "gmcs";
+				}
+				else
+				{
+					// if a version was specified try to find the best matching
+					if (version <= 20 && exists("gmcs")) compiler = "gmcs";
+					else if (version <= 21 && silverlight && exists("smcs")) compiler = "smcs";
+					else if (version <= 40 && exists("dmcs")) compiler = "dmcs";
+					else if (exists("mcs")) compiler = "mcs";
+				}
+				if (compiler != null)
+				{
+					this.path = "";
+					this.compiler = compiler;
+					log('Found mono compiler: $compiler for version: $version');
+				}
 			}
-			if (compiler != null)
-			{
-				this.path = "";
-				this.compiler = compiler;
-				log('Found mono compiler: $compiler for version: $version');
-			}
-		  }
 		} else {
-		  if (exists(this.csharpCompiler))
+			if (exists(this.csharpCompiler))
 			{
 				this.path = "";
 				this.compiler = this.csharpCompiler;
@@ -176,7 +176,7 @@ class CSharpCompiler extends Compiler
 		if (path == null)
 		{
 			//TODO look for mono path
-		 	throw Error.CompilerNotFound;
+			throw Error.CompilerNotFound;
 		}
 	}
 
@@ -254,7 +254,6 @@ class CSharpCompiler extends Compiler
 				this.compiler = "csc";
 			}
 		}
-
 	}
 
 	private function preProcess()
@@ -274,16 +273,16 @@ class CSharpCompiler extends Compiler
 		this.version = version;
 
 		// get requested csharp compiler
-		this.csharpCompiler = data.definesData.get("csharp-compiler");
+		this.csharpCompiler = getDefine(data, CSHARP_COMPILER);
 
 		//get important defined vars
-		this.silverlight = data.defines.exists("silverlight");
-		this.dll = data.defines.exists("dll") || data.main == null;
-		this.debug = data.defines.exists("debug");
+		this.silverlight = hasDefine(data, SILVERLIGHT);
+		this.dll = hasDefine(data, DLL) || data.main == null;
+		this.warn = getWarningLevel(data);
+		this.arch = getDefine(data, ARCH);
 		this.unsafe = data.defines.exists("unsafe");
-		this.warn = data.defines.exists("warn");
+		this.debug = data.defines.exists("debug");
 		this.verbose = data.defines.exists("verbose");
-		this.arch = data.definesData.get('arch');
 
 		// massage the library names
 		this.libs = [];
@@ -322,7 +321,27 @@ class CSharpCompiler extends Compiler
 		}
 		if (debug)
 			name += "-Debug";
-    this.name = name;
+
+		this.name = name;
 	}
 
+	private function getWarningLevel(data:Data):Int
+	{
+		if (!hasDefine(data, WARN)) return 0;
+		var warnDefine = getDefine(data, WARN);
+		if (warnDefine == "") return 1;
+		return Std.parseInt(warnDefine);
+	}
+
+	private function hasDefine(data:Data, def:CsCustomDefine):Bool
+	{
+		return data.defines.exists(def.withNamespace()) || data.defines.exists(def);
+	}
+
+	private function getDefine(data:Data, def:CsCustomDefine):String
+	{
+		var d = data.definesData.get(def.withNamespace());
+		if (d != null) return d;
+		return data.definesData.get(def);
+	}
 }
