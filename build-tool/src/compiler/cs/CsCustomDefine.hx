@@ -4,7 +4,7 @@ package compiler.cs;
 	/**
 		If set, output assembly as a library dll.
 	**/
-	var DLL = 'dll';
+	var Dll = 'dll';
 
 	/**
 		Specifies the target platform of the output assembly ARCH can be one of:

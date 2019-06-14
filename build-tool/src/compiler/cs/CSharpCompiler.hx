@@ -277,7 +277,7 @@ class CSharpCompiler extends Compiler
 
 		//get important defined vars
 		this.silverlight = hasDefine(data, Silverlight);
-		this.dll = hasDefine(data, DLL) || data.main == null;
+		this.dll = hasDefine(data, Dll) || data.main == null;
 		this.warn = getWarningLevel(data);
 		this.arch = getDefine(data, Arch);
 		this.unsafe = data.defines.exists("unsafe");
