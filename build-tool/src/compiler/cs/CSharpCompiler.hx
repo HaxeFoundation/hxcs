@@ -263,7 +263,7 @@ class CSharpCompiler extends Compiler
 
 		//get requested version
 		var version:Null<Int> = null;
-		for (ver in [45,40,35,30,21,20])
+		for (ver in [50,45,40,35,30,21,20])
 		{
 			if (data.defines.exists("NET_" + ver))
 			{
