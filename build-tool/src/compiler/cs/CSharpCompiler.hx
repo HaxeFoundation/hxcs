@@ -167,8 +167,9 @@ class CSharpCompiler extends Compiler
 		} else {
 		  if (exists(this.csharpCompiler))
 			{
-				this.path = "";
-				this.compiler = this.csharpCompiler;
+				var index = this.csharpCompiler.lastIndexOf( this.delim ) + 1;
+				this.path = this.csharpCompiler.substr( 0, index );
+				this.compiler = this.csharpCompiler.substr( index );
 			}
 		}
 
@@ -235,6 +236,7 @@ class CSharpCompiler extends Compiler
 					if (regex.match(f))
 					{
 						var ver = Std.parseFloat(regex.matched(1));
+						var netver = Std.parseInt(regex.matched(1).replace('.', ''));
 						log('found framework: $f (ver $ver)');
 						if (!Math.isNaN(ver) && (foundVer == null || foundVer < ver))
 						{
@@ -243,6 +245,7 @@ class CSharpCompiler extends Compiler
 								log('found path:$path/$f/csc.exe');
 								foundPath = path + '/' + f;
 								foundVer = ver;
+								if (netver == version) break;
 							}
 						}
 					}
