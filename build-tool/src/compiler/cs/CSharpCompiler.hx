@@ -148,14 +148,14 @@ class CSharpCompiler extends Compiler
 				else if (exists("dmcs")) compiler = "dmcs";
 				else if (silverlight && exists("smcs")) compiler = "smcs";
 				else if (exists("gmcs")) compiler = "gmcs";
-			} 
+			}
 			else
 			{
 				// if a version was specified try to find the best matching
 				if (version <= 20 && exists("gmcs")) compiler = "gmcs";
 				else if (version <= 21 && silverlight && exists("smcs")) compiler = "smcs";
-				else if (version <= 40 && exists("dmcs")) compiler = "dmcs";
 				else if (exists("mcs")) compiler = "mcs";
+				else if (version <= 40 && exists("dmcs")) compiler = "dmcs";
 			}
 			if (compiler != null)
 			{
