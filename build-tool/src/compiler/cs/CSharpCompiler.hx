@@ -1,12 +1,15 @@
 package compiler.cs;
+import haxe.io.Path;
 import compiler.Compiler;
 import compiler.Error;
+
+import compiler.cs.system.System;
+import compiler.cs.system.StdSystem;
+
 import haxe.io.BytesOutput;
 import input.Data;
-import sys.FileSystem;
-import sys.io.File;
-import sys.io.Process;
 using StringTools;
+
 
 class CSharpCompiler extends Compiler
 {
@@ -29,10 +32,12 @@ class CSharpCompiler extends Compiler
 	public var data(default, null):Data;
 
 	var cmd:CommandLine;
+	var system:System;
 
-	public function new(cmd:CommandLine)
+	public function new(cmd:CommandLine, ?system:System)
 	{
 		this.cmd = cmd;
+		this.system = if(system != null) system else new StdSystem();
 	}
 
 	private function log(str:String,?pos:haxe.PosInfos)
@@ -40,18 +45,21 @@ class CSharpCompiler extends Compiler
 		if (this.verbose) haxe.Log.trace(str,pos);
 	}
 
-	@:access(haxe.io.Path.escape)
 	override public function compile(data:Data):Void
 	{
 		this.data = data;
 		preProcess();
-		if (!FileSystem.exists("bin"))
-			FileSystem.createDirectory("bin");
+		if (!system.exists("bin"))
+			system.createDirectory("bin");
 		findCompiler();
 		writeProject();
+		doCompilation();
+	}
 
+	@:access(haxe.io.Path.escape)
+	function generateArgs() {
 		var output = cmd.output == null ? 'bin/' + this.name : Tools.addPath(data.baseDir, cmd.output),
-				outDir = haxe.io.Path.directory(output);
+			outDir = haxe.io.Path.directory(output);
 		var args = ['/nologo',
 					'/optimize' + (debug ? '-' : '+'),
 					'/debug' + (debug ? '+' : '-'),
@@ -90,19 +98,33 @@ class CSharpCompiler extends Compiler
 		for (opt in data.opts)
 			args.push(opt);
 
+		return args;
+	}
+	
+	function doCompilation() {
+		var args = generateArgs();
+
 		log('cmd arguments:  ${args.join(" ")}');
 		var ret = 0;
 		try
 		{
-			if (Sys.systemName() == "Windows" && !data.defines.exists("LONG_COMMAND_LINE"))
+			if (system.systemName() == "Windows" && !data.defines.exists("LONG_COMMAND_LINE"))
 			{
 				//save in a file
-				sys.io.File.saveContent('cmd',args.join('\n'));
+				system.saveContent('cmd',args.join('\n'));
 				args = ['@cmd'];
 			}
+
+			var extension = "";
+			if(system.systemName() == "Windows"){
+				extension = (this.compiler == "csc" ? ".exe" : ".bat");
+			}
+			var command = this.path + this.compiler + extension;
+			
 			if (verbose)
-				Sys.println(this.path + this.compiler + " " + args.join(" "));
-			ret = Sys.command(this.path + this.compiler + (Sys.systemName() == "Windows" ? (this.compiler == "csc" ? ".exe" : ".bat") : ""), args);
+				system.println(command + " " + args.join(" "));
+
+			ret = system.command(command, args);
 		}
 		catch (e:Dynamic)
 		{
@@ -119,14 +141,15 @@ class CSharpCompiler extends Compiler
 		var bytes = new BytesOutput();
 		new CsProjWriter(bytes).write(this);
 
+		var projectPath = this.name + ".csproj";
 		var bytes = bytes.getBytes();
-		if (FileSystem.exists(this.name + ".csproj"))
+		if (system.exists(projectPath))
 		{
-			if (File.getBytes(this.name + ".csproj").compare(bytes) == 0)
+			if (system.getBytes(projectPath).compare(bytes) == 0)
 				return;
 		}
 
-		File.saveBytes(this.name + ".csproj", bytes);
+		system.saveBytes(projectPath, bytes);
 	}
 
 	private function findCompiler()
@@ -134,7 +157,7 @@ class CSharpCompiler extends Compiler
 		if (csharpCompiler == null) {
 		  log('finding compiler...');
 		  //if windows look first for MSVC toolchain
-		  if (Sys.systemName() == "Windows")
+		  if (system.systemName() == "Windows")
 		  	findMsvc();
 
 		  if (path == null)
@@ -184,7 +207,7 @@ class CSharpCompiler extends Compiler
 	{
 		if (checkArgs == null) checkArgs = ["-help"];
 
-		return if (Sys.systemName() == "Windows")
+		return if (system.systemName() == "Windows")
 			_exists(exe + ".exe", checkArgs) || _exists(exe + ".bat", checkArgs);
 		else
 			_exists(exe, checkArgs);
@@ -194,7 +217,7 @@ class CSharpCompiler extends Compiler
 	{
 		try
 		{
-			var ret = new Process(exe, checkArgs);
+			var ret = system.startProcess(exe, checkArgs);
 			ret.stdout.readAll();
 			return ret.exitCode() == 0;
 		}
@@ -215,11 +238,10 @@ class CSharpCompiler extends Compiler
 			log('found csc compiler');
 		}
 
-		var windir = Sys.getEnv("windir");
+		var windir = system.getEnv("windir");
 		if (windir == null)
 			windir = "C:\\Windows";
-		log('WINDIR: ${windir} (${Sys.getEnv('windir')})');
-		var path = null;
+		log('WINDIR: ${windir} (${system.getEnv('windir')})');
 
 		for (path in [windir+"\\Microsoft.NET\\Framework64", windir+"\\Microsoft.NET\\Framework"])
 		{
@@ -227,10 +249,10 @@ class CSharpCompiler extends Compiler
 
 			var foundVer:Null<Float> = null;
 			var foundPath = null;
-			if (FileSystem.exists(path))
+			if (system.exists(path))
 			{
 				var regex = ~/v(\d+.\d+)/;
-				for (f in FileSystem.readDirectory(path))
+				for (f in system.readDirectory(path))
 				{
 					if (regex.match(f))
 					{
@@ -238,7 +260,7 @@ class CSharpCompiler extends Compiler
 						log('found framework: $f (ver $ver)');
 						if (!Math.isNaN(ver) && (foundVer == null || foundVer < ver))
 						{
-							if (FileSystem.exists((path + "/" + f + "/csc.exe")))
+							if (system.exists((path + "/" + f + "/csc.exe")))
 							{
 								log('found path:$path/$f/csc.exe');
 								foundPath = path + '/' + f;
@@ -259,7 +281,7 @@ class CSharpCompiler extends Compiler
 
 	private function preProcess()
 	{
-		delim = Sys.systemName() == "Windows" ? "\\" : "/";
+		delim = system.systemName() == "Windows" ? "\\" : "/";
 
 		//get requested version
 		var version:Null<Int> = null;
@@ -303,26 +325,18 @@ class CSharpCompiler extends Compiler
 
 		// get name from main class if there's one
 		// or from output directory name if there's none
-		var name = if (data.main != null)
+		var name = null;
+		if (data.main != null)
 		{
-			var idx = data.main.lastIndexOf(".");
-			if (idx != -1)
-				data.main.substr(idx + 1);
-			else
-				data.main;
+			name = data.main.split('.').pop();
 		}
 		else
 		{
-			var name = Sys.getCwd();
-			name = name.substr(0, name.length - 1);
-			if (name.lastIndexOf("\\") > name.lastIndexOf("/"))
-				name = name.split("\\").pop();
-			else
-				name = name.split("/").pop();
+			name = Path.withoutDirectory(this.system.getCwd());
 		}
 		if (debug)
 			name += "-Debug";
-    this.name = name;
+		this.name = name;
 	}
 
 }

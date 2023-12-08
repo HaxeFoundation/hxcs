@@ -94,7 +94,7 @@ class BuildAndRunTest {
         var build_txt = Path.join([outDir, 'hxcs_build.txt']);
         var binPath   = Path.join([outDir, 'bin', program]);
 
-        runCommand('haxelib', 'run-dir', 'hxcs', projectDir, build_txt, '--out', binPath);
+        checkCommand('haxelib', ['run-dir', 'hxcs', projectDir, build_txt, '--out', binPath]);
 
         if(Sys.systemName() == "Windows" || !FileSystem.exists(binPath)){
             binPath += '.exe';

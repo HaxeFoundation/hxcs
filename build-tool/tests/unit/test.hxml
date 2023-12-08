@@ -1,0 +1,14 @@
+## Neko
+--main TestMain
+--library munit
+--library hamcrest
+--library proxsys
+
+-cp ../../src
+-cp ../../base/src
+
+-cp .
+-neko ../../../build/unit-test/neko_test.n
+
+# TO-DO: should stub this resource
+-resource ../../csproj-template.mtt@csproj-template.mtt

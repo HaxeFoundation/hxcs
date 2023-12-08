@@ -1,0 +1,6 @@
+version=haxelib
+src=.
+bin=../../../build/unit-test
+report=../../../report/unit-test
+hxml=test.hxml
+classPaths=../../src
