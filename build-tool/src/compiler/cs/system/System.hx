@@ -1,13 +1,13 @@
 package compiler.cs.system;
 
+import sys.FileStat;
 import haxe.io.Bytes;
-import sys.io.File;
-import sys.FileSystem;
 
 interface System {
     function exists(path:String): Bool;
     function createDirectory(path:String): Void;
     function readDirectory(path:String): Array<String>;
+    function isDirectory(path:String): Bool;
 
     function getBytes(path:String):Bytes;
     function saveBytes(path:String, bytes:Bytes):Void;
@@ -20,4 +20,6 @@ interface System {
     function getCwd(): String;
     function getEnv(envVar:String): String;
     function println(value:Dynamic):Void;
+
+    function stat(path:String): FileStat;
 }

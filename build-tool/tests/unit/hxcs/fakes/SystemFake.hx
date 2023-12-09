@@ -1,5 +1,6 @@
 package hxcs.fakes;
 
+import sys.FileStat;
 import haxe.io.Bytes;
 import proxsys.fakes.CommandMatcher.CommandSpecMatcher;
 import compiler.cs.system.ProcessInstance;
@@ -68,6 +69,10 @@ class SystemFake implements System{
         this.sysName = name;
     }
 
+    public function isDirectory(path:String):Bool {
+        return this.files.isDirectory(path);
+    }
+
     public function readDirectory(path:String):Array<String> {
         return files.readDirectory(path);
     }
@@ -98,4 +103,8 @@ class SystemFake implements System{
 
     public function println(value:Dynamic)
     {}
+
+    public function stat(path:String):FileStat {
+        return this.files.stat(path);
+    }
 }

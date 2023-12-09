@@ -1,5 +1,7 @@
 package hxcs.tests.compiler;
 
+import massive.munit.Assert;
+import org.hamcrest.Matchers;
 import haxe.io.Path;
 
 import org.hamcrest.Matchers.*;
@@ -8,6 +10,34 @@ using hxcs.fakes.SystemFake.FakeFilesAssertions;
 using StringTools;
 
 class PreProcessCompilerTest extends BaseCompilerTests{
+
+    @Test
+    public function parse_lib_references() {
+        data.libs = [
+            'libname',
+            'nopath.dll',
+            'with/path/example.dll'
+        ];
+        var expected = [
+            {name:'libname', hint: null},
+            {name:'nopath', hint: 'nopath.dll'},
+            {name:'example', hint: 'with/path/example.dll'}
+        ];
+
+        givenCompiler('mcs');
+
+        //When
+        compiler.compile(data);
+
+        //Then:
+        assertThat(compiler.libs, hasSize(expected.length));
+
+        for (i in 0...expected.length){
+            Assert.areEqual(expected[i], compiler.libs[i],
+                'Compiler library $i should be ${expected[i]}, but was: ${compiler.libs[i]}');
+        }
+    }
+
 
     @Test
     public function get_project_name_from_directory() {

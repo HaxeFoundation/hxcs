@@ -8,8 +8,9 @@ import compiler.cs.system.StdSystem;
 
 import haxe.io.BytesOutput;
 import input.Data;
-using StringTools;
 
+using StringTools;
+using compiler.cs.system.SystemTools;
 
 class CSharpCompiler extends Compiler
 {
@@ -80,9 +81,11 @@ class CSharpCompiler extends Compiler
 		{
 			if (ref.hint != null)
 			{
-				var fullpath = Tools.addPath(data.baseDir,ref.hint),
-				    mypath = Tools.addPath(outDir, haxe.io.Path.withoutDirectory(ref.hint));
-				Tools.copyIfNewer(fullpath, mypath);
+				var fullpath = ref.hint.addBasePath(data.baseDir);
+				var mypath   = Path.withoutDirectory(ref.hint).addBasePath(outDir);
+
+				log('copying lib from $fullpath to $mypath');
+				system.copyIfNewer(fullpath, mypath);
 
 				args.push('/reference:$mypath');
 			}

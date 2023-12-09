@@ -1,5 +1,6 @@
 package compiler.cs.system;
 
+import sys.FileStat;
 import haxe.io.Bytes;
 import sys.io.File;
 import sys.FileSystem;
@@ -40,6 +41,10 @@ class StdSystem implements System{
         File.saveContent(path, content);
     }
 
+    public function isDirectory(path:String):Bool {
+        return FileSystem.isDirectory(path);
+    }
+
     public function readDirectory(path:String): Array<String> {
         return FileSystem.readDirectory(path);
     }
@@ -54,5 +59,9 @@ class StdSystem implements System{
 
     public function println(value:Dynamic) {
         Sys.println(value);
+    }
+
+    public function stat(path:String):FileStat {
+        return FileSystem.stat(path);
     }
 }

@@ -1,9 +1,11 @@
 package hxcs.tests.compiler;
 
+import haxe.io.Bytes;
 import haxe.io.Path;
 import hxcs.tests.compiler.BaseCompilerTests.CompilationOptions;
 import proxsys.fakes.CommandMatcher.CommandSpec;
 
+import org.hamcrest.Matchers.*;
 
 using hxcs.fakes.SystemFake.FakeFilesAssertions;
 using StringTools;
@@ -18,6 +20,56 @@ class CompilerTest extends BaseCompilerTests{
         compiler.compile(data);
 
         fakeSys.files.shouldBeADirectory("bin");
+    }
+
+    @Test
+    public function copy_local_libs_to_given_output_dir() {
+        test_copy_local_libs('output/example.exe', 'output');
+    }
+
+    @Test
+    public function copy_local_libs_to_bin() {
+        test_copy_local_libs(null, 'bin');
+    }
+
+    function test_copy_local_libs(cmdOutput:String, outDir:String) {
+        //Given
+        fakeCmd.output = cmdOutput;
+
+        data.libs = [
+            'ignore',
+            'libwith.dll',
+            'from/other/path/example1.dll',
+            '/from/absolute/path/example2.dll'
+        ];
+        var contents = givenFilesHasContent(data.libs);
+
+        //Given
+        givenCompiler('mcs');
+
+        //When
+        compiler.compile(data);
+
+        //Then
+        for(i in 1...data.libs.length){//ignore first one
+            var lib = data.libs[i];
+            var to  = Path.join([outDir, Path.withoutDirectory(lib)]);
+
+            should_have_copied(lib, to, contents[i]);
+        }
+    }
+
+    function givenFilesHasContent(files:Array<String>) {
+        var contents = [];
+
+        for(f in files){
+            var data = Bytes.ofString(f);
+            fakeSys.saveBytes(f, data);
+
+            contents.push(data);
+        }
+
+        return contents;
     }
 
     @Test
@@ -127,6 +179,13 @@ class CompilerTest extends BaseCompilerTests{
         var ext = (Path.withoutExtension(executable) == "csc" ? "exe" : "bat");
 
         return (systemName == "Windows") ? Path.withExtension(cmd, ext) : cmd;
+    }
+
+    function should_have_copied(srcPath:String, dstPath:String, content:Bytes) {
+        var out = this.fakeSys.getBytes(dstPath);
+
+        assertThat(out, equalTo(content),
+            '"$srcPath" should be copied to "$dstPath"');
     }
 
 }
