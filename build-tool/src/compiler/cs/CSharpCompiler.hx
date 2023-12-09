@@ -32,6 +32,9 @@ class CSharpCompiler extends Compiler
 
 	public var data(default, null):Data;
 
+	var output:String;
+	var outDir:String;
+
 	var cmd:CommandLine;
 	var system:System;
 
@@ -58,9 +61,9 @@ class CSharpCompiler extends Compiler
 	}
 
 	@:access(haxe.io.Path.escape)
-	function generateArgs() {
-		var output = cmd.output == null ? 'bin/' + this.name : Tools.addPath(data.baseDir, cmd.output),
-			outDir = haxe.io.Path.directory(output);
+	function generateArgs(?localLibs:Array<String>) {
+		if(localLibs == null) localLibs = [];
+
 		var args = ['/nologo',
 					'/optimize' + (debug ? '-' : '+'),
 					'/debug' + (debug ? '+' : '-'),
@@ -77,18 +80,9 @@ class CSharpCompiler extends Compiler
 			var main = data.main.substring(idx + 1);
 			args.push('/main:' + namespace + (main == "Main" ? "EntryPoint__Main" : main));
 		}
-		for (ref in libs)
+		for (libpath in localLibs)
 		{
-			if (ref.hint != null)
-			{
-				var fullpath = ref.hint.addBasePath(data.baseDir);
-				var mypath   = Path.withoutDirectory(ref.hint).addBasePath(outDir);
-
-				log('copying lib from $fullpath to $mypath');
-				system.copyIfNewer(fullpath, mypath);
-
-				args.push('/reference:$mypath');
-			}
+			args.push('/reference:$libpath');
 		}
 		for (res in data.resources) {
 			res = haxe.io.Path.escape(res, true);
@@ -105,7 +99,8 @@ class CSharpCompiler extends Compiler
 	}
 	
 	function doCompilation() {
-		var args = generateArgs();
+		var localLibs = copyLocalLibraries();
+		var args = generateArgs(localLibs);
 
 		log('cmd arguments:  ${args.join(" ")}');
 		var ret = 0;
@@ -122,8 +117,10 @@ class CSharpCompiler extends Compiler
 			if(system.systemName() == "Windows"){
 				extension = (this.compiler == "csc" ? ".exe" : ".bat");
 			}
-			var command = this.path + this.compiler + extension;
-			
+
+			var compilerExec = this.compiler + extension;
+			var command      = Path.join([this.path, compilerExec]);
+
 			if (verbose)
 				system.println(command + " " + args.join(" "));
 
@@ -136,6 +133,26 @@ class CSharpCompiler extends Compiler
 
 		if (ret != 0)
 			throw Error.BuildFailed;
+	}
+
+	function copyLocalLibraries() {
+		var copiedLibs = [];
+
+		for (ref in this.libs)
+		{
+			if (ref.hint != null)
+			{
+				var fullpath = ref.hint.addBasePath(data.baseDir);
+				var mypath   = Path.withoutDirectory(ref.hint).addBasePath(outDir);
+
+				log('copying lib from $fullpath to $mypath');
+				system.copyIfNewer(fullpath, mypath);
+
+				copiedLibs.push(mypath);
+			}
+		}
+
+		return copiedLibs;
 	}
 
 	private function writeProject()
@@ -246,8 +263,10 @@ class CSharpCompiler extends Compiler
 			windir = "C:\\Windows";
 		log('WINDIR: ${windir} (${system.getEnv('windir')})');
 
-		for (path in [windir+"\\Microsoft.NET\\Framework64", windir+"\\Microsoft.NET\\Framework"])
+		for (winsubdir in ["\\Microsoft.NET\\Framework64", "\\Microsoft.NET\\Framework"])
 		{
+			var path = Path.join([windir, winsubdir]);
+
 			log('looking up framework at ' + path);
 
 			var foundVer:Null<Float> = null;
@@ -263,10 +282,12 @@ class CSharpCompiler extends Compiler
 						log('found framework: $f (ver $ver)');
 						if (!Math.isNaN(ver) && (foundVer == null || foundVer < ver))
 						{
-							if (system.exists((path + "/" + f + "/csc.exe")))
+							var compilerPath = Path.join([path, f, 'csc.exe']);
+
+							if (system.exists(compilerPath))
 							{
-								log('found path:$path/$f/csc.exe');
-								foundPath = path + '/' + f;
+								log('found path:$compilerPath');
+								foundPath = Path.directory(compilerPath);
 								foundVer = ver;
 							}
 						}
@@ -275,7 +296,7 @@ class CSharpCompiler extends Compiler
 			}
 			if (foundPath != null)
 			{
-				this.path = foundPath + "/";
+				this.path = foundPath;
 				this.compiler = "csc";
 			}
 		}
@@ -315,11 +336,11 @@ class CSharpCompiler extends Compiler
 		for (lib in data.libs)
 		{
 			var parsed = {name: lib, hint: null};
-			if (lib.lastIndexOf(".dll") > 0)
+
+			if (Path.extension(lib) == "dll")
 			{
 				parsed.hint = lib;
-				parsed.name = lib.split(delim).pop();
-				parsed.name = parsed.name.substring(0, parsed.name.lastIndexOf(".dll"));
+				parsed.name = Path.withoutExtension(Path.withoutDirectory(lib));
 			}
 
 			this.libs.push(parsed);
@@ -335,11 +356,20 @@ class CSharpCompiler extends Compiler
 		}
 		else
 		{
-			name = Path.withoutDirectory(this.system.getCwd());
+			name = Path.withoutDirectory(system.getCwd());
 		}
 		if (debug)
 			name += "-Debug";
 		this.name = name;
+
+		if(cmd.output == null){
+			this.outDir = 'bin';
+			this.output = Path.join([outDir, name]);
+		}
+		else {
+			this.output = cmd.output.addBasePath(data.baseDir);
+			this.outDir = Path.directory(this.output);
+		}
 	}
 
 }

@@ -109,7 +109,7 @@ class BaseCompilerTests {
             opts: [],
             libs: [],
             resources: [],
-            main: '',
+            main: null,
             modules: [],
             definesData: [],
             defines: []

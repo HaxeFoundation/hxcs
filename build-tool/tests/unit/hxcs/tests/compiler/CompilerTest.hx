@@ -36,27 +36,41 @@ class CompilerTest extends BaseCompilerTests{
         //Given
         fakeCmd.output = cmdOutput;
 
-        data.libs = [
-            'ignore',
+        var localLibs = [
             'libwith.dll',
             'from/other/path/example1.dll',
             '/from/absolute/path/example2.dll'
         ];
-        var contents = givenFilesHasContent(data.libs);
+        data.libs = ['ignore'].concat(localLibs);
+        var contents = givenFilesHasContent(localLibs);
 
         //Given
-        givenCompiler('mcs');
+        var compilerCmd = 'mcs';
+        givenCompiler(compilerCmd);
 
         //When
         compiler.compile(data);
 
         //Then
-        for(i in 1...data.libs.length){//ignore first one
-            var lib = data.libs[i];
-            var to  = Path.join([outDir, Path.withoutDirectory(lib)]);
+        var copiedLibs = [
+            for(lib in localLibs) Path.join([outDir, Path.withoutDirectory(lib)])
+        ];
+        for(i in 0...localLibs.length){//ignore first one
+            var lib = localLibs[i];
+            var to  = copiedLibs[i];
 
             should_have_copied(lib, to, contents[i]);
         }
+
+        //And:
+        var libArgs = [for (lib in copiedLibs) '/reference:$lib'];
+
+        var found = fakeSys.executed(compilerCmd, (cmdSpec:CommandSpec)->{
+            return cmdSpec.containsArgs(libArgs);
+        });
+
+        assertThat(found, is(notNullValue()),
+            'Failed to find command with references to lib args: $libArgs');
     }
 
     function givenFilesHasContent(files:Array<String>) {
@@ -97,8 +111,9 @@ class CompilerTest extends BaseCompilerTests{
                 var netVersion = "v4.8";
                 var base = if(winDir == null) 'C:\\Windows' else winDir;
 
-                //TO-DO: CSharpCompiler should not use both \\ and /
-                var compilerPath = '$base\\Microsoft.NET\\Framework$binVersion/$netVersion/csc.exe';
+                var compilerPath = Path.join([
+                    base, 'Microsoft.NET', 'Framework$binVersion', netVersion, 'csc.exe'
+                ]);
 
                 test_select_compiler(compilerPath, [compilerPath], {
                     env: ['windir'=> winDir],

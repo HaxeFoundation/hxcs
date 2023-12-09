@@ -1,5 +1,6 @@
 package hxcs.tests.compiler;
 
+import proxsys.fakes.CommandMatcher.CommandSpec;
 import massive.munit.Assert;
 import org.hamcrest.Matchers;
 import haxe.io.Path;
@@ -23,8 +24,9 @@ class PreProcessCompilerTest extends BaseCompilerTests{
             {name:'nopath', hint: 'nopath.dll'},
             {name:'example', hint: 'with/path/example.dll'}
         ];
+        var compilerCmd = 'mcs';
 
-        givenCompiler('mcs');
+        givenCompiler(compilerCmd);
 
         //When
         compiler.compile(data);
