@@ -1,6 +1,6 @@
 package hxcs.tests.compiler;
 
-import haxe.io.Path;
+import hxcs.helpers.DataGenerator;
 import proxsys.fakes.CommandMatcher.CommandSpecMatcher;
 import proxsys.fakes.CommandMatcher.CommandSpec;
 import input.Data;
@@ -11,6 +11,7 @@ import compiler.cs.CSharpCompiler;
 import org.hamcrest.Matchers.*;
 
 using hxcs.fakes.SystemFake.FakeFilesAssertions;
+using hxcs.fakes.FakeCompilerTools;
 using StringTools;
 
 typedef CompilationOptions = {
@@ -72,14 +73,7 @@ class BaseCompilerTests {
     }
 
     function givenCompiler(command:String, ?checkArgs:Array<String>, ?system:String) {
-        if(checkArgs == null) checkArgs = ['-help'];
-
-        if (system == "Windows"){
-            command = Path.withExtension(command, "exe");
-        }
-
-        fakeSys.givenProcess(command, checkArgs).output('').setExitCode(0);
-        fakeSys.givenProcess(command).output('').setExitCode(0);
+        fakeSys.givenCompiler(command, checkArgs, system);
     }
 
     function shouldUseCompilerWith(
@@ -104,15 +98,6 @@ class BaseCompilerTests {
     // ---------------------------------------------------
 
     function makeDefaultData(): Data {
-        return {
-            baseDir: '',
-            opts: [],
-            libs: [],
-            resources: [],
-            main: null,
-            modules: [],
-            definesData: [],
-            defines: []
-        };
+        return DataGenerator.defaultData();
     }
 }

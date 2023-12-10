@@ -1,4 +1,6 @@
 package compiler.cs;
+
+import compiler.cs.compilation.preprocessing.CompilerParameters;
 import haxe.io.Output;
 import haxe.Resource;
 import haxe.Template;
@@ -13,21 +15,21 @@ class CsProjWriter
 		this.stream = stream;
 	}
 
-	public function write(compiler:CSharpCompiler):Void
+	public function write(params:CompilerParameters):Void
 	{
-		var versionStr : String = (compiler.version == null ? "3.5" : Std.string(compiler.version / 10));
+		var versionStr : String = (params.version == null ? "3.5" : Std.string(params.version / 10));
 		if (versionStr.indexOf(".") < 0) {
 			versionStr += ".0";
 		}
 		var template = new Template( Resource.getString("csproj-template.mtt") );
 		stream.writeString(template.execute( {
-			outputType : (compiler.dll ? "Library" : "Exe"),
-			name : compiler.name,
+			outputType : (params.dll ? "Library" : "Exe"),
+			name : params.name,
 			targetFramework : versionStr,
-			unsafe : compiler.unsafe,
-			refs : compiler.libs,
-			srcs : compiler.data.modules.map(function(m) return "src\\" + m.path.split(".").join("\\") + ".cs"),
-			res : compiler.data.resources.map(function(res) return "src\\Resources\\" + haxe.crypto.Base64.encode(haxe.io.Bytes.ofString(res)))
+			unsafe : params.unsafe,
+			refs : params.libs,
+			srcs : params.data.modules.map(function(m) return "src\\" + m.path.split(".").join("\\") + ".cs"),
+			res : params.data.resources.map(function(res) return "src\\Resources\\" + haxe.crypto.Base64.encode(haxe.io.Bytes.ofString(res)))
 		} ));
 	}
 
