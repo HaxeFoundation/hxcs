@@ -5,8 +5,8 @@ import input.Data;
 
 @:structInit
 class CompilerParameters{
-    @:optional
-    public var data(default, default):Data;
+	@:optional
+	public var data(default, default):Data;
 
 	@:optional
 	public var version(default, default):Null<Int>;
@@ -37,23 +37,27 @@ class CompilerParameters{
 	@:optional
 	public var outDir(default, default):String;
 
-    public function clone(): CompilerParameters {
-        return {
-            data: data,
-            version: version,
-            silverlight: silverlight,
-            unsafe: unsafe,
-            verbose: verbose,
-            warn: warn,
-            debug: debug,
-            dll: dll,
-            name: name,
-            main: main,
-            libs: if(libs == null) null else libs.copy(),
-            csharpCompiler: csharpCompiler,
-            arch: arch,
-            outDir: outDir,
-            output: output
-        };
-    }
+	public static function make(param: CompilerParameters) {
+		return param;
+	}
+
+	public function clone(): CompilerParameters {
+		return {
+			data: data,
+			version: version,
+			silverlight: silverlight,
+			unsafe: unsafe,
+			verbose: verbose,
+			warn: warn,
+			debug: debug,
+			dll: dll,
+			name: name,
+			main: main,
+			libs: if(libs == null) null else libs.copy(),
+			csharpCompiler: csharpCompiler,
+			arch: arch,
+			outDir: outDir,
+			output: output
+		};
+	}
 }

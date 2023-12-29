@@ -79,6 +79,14 @@ class BaseCompilerTests {
     function shouldUseCompilerWith(
         command:String, ?args: Array<String>, ?matcher:CommandSpecMatcher, remove:Bool=false)
     {
+        assertThat(executedCommandWith(command, args, matcher, remove), is(notNullValue()),
+            'Should have used compiler "${command}" with: $args'
+        );
+    }
+
+    function executedCommandWith(
+        command:String, ?args: Array<String>, ?matcher:CommandSpecMatcher, remove:Bool=false)
+    {
         if(matcher == null){
             matcher = (cmdSpec:CommandSpec)->{
                 for(a in args){
@@ -90,9 +98,7 @@ class BaseCompilerTests {
             };
         }
 
-        assertThat(fakeSys.executed(command, matcher, remove), is(notNullValue()),
-            'Should have used compiler "${command}" with: $args'
-        );
+        return fakeSys.executed(command, matcher, remove);
     }
 
     // ---------------------------------------------------
