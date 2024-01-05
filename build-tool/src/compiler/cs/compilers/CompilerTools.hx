@@ -8,13 +8,32 @@ class CompilerTools {
 
 	public static function compilerExists(system:System, exe:String, checkArgs:Array<String> = null):Bool
 	{
+		return checkCompiler(system, exe, checkArgs) != null;
+	}
+
+
+	public static function
+		checkCompiler(system:System, compiler:String, checkArgs:Array<String> = null):String
+	{
 		if (checkArgs == null) checkArgs = ["-help"];
 
-		if (system.systemName() == "Windows")
-			return _exists(system, exe + ".exe", checkArgs)
-				|| _exists(system, exe + ".bat", checkArgs);
-		else
-			return _exists(system, exe, checkArgs);
+		var extensions = (system.systemName() == "Windows")
+							? ["exe", "bat"] : [null];
+
+		for (ext in extensions){
+			var cmd = withExtension(compiler, ext);
+			if(_exists(system, cmd, checkArgs)){
+				return cmd;
+			}
+		}
+
+		return null;
+	}
+
+	static function withExtension(path:String, ?ext:String) {
+		if(ext == null)
+			return path;
+		return Path.withExtension(path, ext);
 	}
 
 	static function _exists(system:System, exe:String, checkArgs:Array<String>):Bool

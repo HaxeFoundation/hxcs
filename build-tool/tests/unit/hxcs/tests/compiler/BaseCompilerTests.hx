@@ -22,7 +22,8 @@ typedef CompilationOptions = {
     ?verbose:Bool,
     ?env: Map<String, Null<String>>,
     ?paths: Iterable<String>,
-    ?hasCompilerCheck:Bool
+    ?hasCompilerCheck:Bool,
+    ?csharpCompiler:String
 };
 
 class BaseCompilerTests {
@@ -59,6 +60,9 @@ class BaseCompilerTests {
             this.fakeSys.setSystemName(options.system);
         if(options.verbose == true){
             this.data.defines.set("verbose", true);
+        }
+        if (options.csharpCompiler != null){
+            this.data.definesData.set("csharp-compiler", options.csharpCompiler);
         }
         if(options.paths != null){
             for(p in options.paths){

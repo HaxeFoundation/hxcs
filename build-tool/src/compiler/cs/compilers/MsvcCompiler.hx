@@ -18,6 +18,9 @@ class MsvcCompiler extends BaseCsCompiler {
 
 	private function findMsvc()
 	{
+		if (system.systemName() != "Windows")
+			return;
+
 		log('looking for MSVC directory');
 		//se if it is in path
 		if (exists("csc"))

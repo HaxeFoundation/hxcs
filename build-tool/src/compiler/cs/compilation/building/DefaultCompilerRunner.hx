@@ -2,23 +2,22 @@ package compiler.cs.compilation.building;
 
 import compiler.cs.compilation.preprocessing.CompilerParameters;
 import compiler.cs.tools.Logger;
-import compiler.cs.compilation.selection.CompilerInfo;
 import compiler.cs.system.System;
 
 using compiler.cs.compilation.building.CompilationTools;
 
 class DefaultCompilerRunner implements CompilerRunner{
-    var compilerInfo:CompilerInfo;
+    var compileCommand:String;
     var system:System;
     var logger:Logger;
     var params:CompilerParameters;
     var argsGen:CompilerArgsGenerator;
 
     public function new(
-        compilerInfo:CompilerInfo, params:CompilerParameters, system:System, logger:Logger,
+        compileCommand:String, params:CompilerParameters, system:System, logger:Logger,
         ?argsGen:CompilerArgsGenerator)
     {
-        this.compilerInfo = compilerInfo;
+        this.compileCommand = compileCommand;
         this.params = params;
         this.system = system;
         this.logger = logger;
@@ -44,9 +43,9 @@ class DefaultCompilerRunner implements CompilerRunner{
 			}
 
 			if (params.verbose)
-				system.println(compilerInfo.command + " " + args.join(" "));
+				system.println(compileCommand + " " + args.join(" "));
 
-			ret = system.command(compilerInfo.command, args);
+			ret = system.command(compileCommand, args);
 		}
 		catch (e:Dynamic)
 		{

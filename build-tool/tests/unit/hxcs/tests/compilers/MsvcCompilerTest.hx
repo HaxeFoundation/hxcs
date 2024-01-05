@@ -19,13 +19,19 @@ class MsvcCompilerTest extends BaseCompilersTest{
         return new MsvcCompiler(this.fakeSys);
     }
 
-    
     @Test
     public function select_compiler_default() {
         var winSys = {system: "Windows"};
 
         test_select_compiler('csc.exe', winSys);
         test_select_compiler('csc.exe', ['ignore_others', 'mcs', 'dmcs', 'gmcs', 'csc'], winSys);
+    }
+
+    @Test
+    public function should_not_select_outside_windows() {
+        var sysOpt = {system: "Other"};
+
+        test_select_compiler(null, ['csc'], sysOpt);
     }
 
     @Test

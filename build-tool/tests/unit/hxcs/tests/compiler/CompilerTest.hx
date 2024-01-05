@@ -98,6 +98,19 @@ class CompilerTest extends BaseCompilerTests{
     }
 
     @Test
+    public function selectCustomCompiler() {
+        var comp = "custom-compiler";
+        var otherCompilers = ["csc", "mcs", "dmcs"];
+
+        var withCustomCompiler = {
+            csharpCompiler: comp
+        };
+
+        test_select_compiler(comp, otherCompilers.concat([comp]), withCustomCompiler);
+        test_select_compiler("mcs", otherCompilers, withCustomCompiler);
+    }
+
+    @Test
     public function selectWindowsCompiler() {
         var winSys = {system: "Windows"};
 

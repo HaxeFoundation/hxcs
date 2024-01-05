@@ -8,6 +8,7 @@ import hxcs.tests.compiler.ProjectWriterTest;
 import hxcs.tests.compiler.CsProjWriterTest;
 import hxcs.tests.compiler.CompilerTest;
 import hxcs.tests.compiler.PreProcessCompilerTest;
+import hxcs.tests.compiler.CompilerSelectorTest;
 
 /**
  * Auto generated Test Suite for MassiveUnit.
@@ -27,5 +28,6 @@ class TestSuite extends massive.munit.TestSuite
 		add(hxcs.tests.compiler.CsProjWriterTest);
 		add(hxcs.tests.compiler.CompilerTest);
 		add(hxcs.tests.compiler.PreProcessCompilerTest);
+		add(hxcs.tests.compiler.CompilerSelectorTest);
 	}
 }

@@ -6,7 +6,6 @@ import compiler.cs.compilers.CsCompiler;
 import compiler.cs.compilation.preprocessing.CompilerParameters;
 import hxcs.tests.compiler.BaseCompilerTests.CompilationOptions;
 
-
 using hxcs.fakes.SystemFake.FakeFilesAssertions;
 using hxcs.fakes.FakeCompilerTools;
 using StringTools;

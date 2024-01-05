@@ -1,10 +1,14 @@
 package compiler.cs;
 
+import compiler.cs.compilers.CustomCompiler;
+import compiler.cs.compilers.MonoCompiler;
+import compiler.cs.compilers.MsvcCompiler;
+import compiler.cs.compilers.CsCompiler;
+import compiler.cs.compilation.CompilerSelector;
 import compiler.cs.compilation.building.DefaultCompilerRunner;
 import compiler.cs.compilation.building.CompilerRunner;
 import compiler.cs.compilation.preprocessing.CompilerParameters;
 import compiler.cs.compilation.project.ProjectGenerator;
-import compiler.cs.compilation.selection.CompilerSelector;
 import compiler.cs.compilation.preprocessing.ParametersParser;
 import compiler.cs.tools.Logger;
 import compiler.Compiler;
@@ -25,7 +29,9 @@ class CSharpCompiler extends Compiler
 	var logger:Logger;
 
 	var paramParser  :ParametersParser;
-	var selector	 :CompilerSelector;
+
+	var compilers    :Array<CsCompiler>;
+	var csSelector	 :CompilerSelector;
 	var projGenerator:ProjectGenerator;
 
 	var params :CompilerParameters;
@@ -37,7 +43,13 @@ class CSharpCompiler extends Compiler
 		this.system = if(system != null) system else new StdSystem();
 		this.logger = if(logger != null) logger else new Logger();
 
-		this.selector      = new CompilerSelector(this.system, this.logger);
+		this.compilers = [
+			new CustomCompiler(this.system, this.logger),
+			new MsvcCompiler(this.system, this.logger),
+			new MonoCompiler(this.system, this.logger)
+		];
+
+		this.csSelector	   = new CompilerSelector();	
 		this.paramParser   = new ParametersParser(this.system);
 		this.projGenerator = new ProjectGenerator(this.system, this.logger);
 	}
@@ -65,9 +77,10 @@ class CSharpCompiler extends Compiler
 	}
 
 	function findCompiler(){
-		var compileInfo = this.selector.findCompiler(params);
+		var compiler = this.csSelector.selectFrom(compilers, params);
 
-        this.builder = new DefaultCompilerRunner(compileInfo, params, system, logger);
+		this.builder = new DefaultCompilerRunner(
+			compiler.compiler, params, system, logger);
 	}
 
 	function writeProject(){
