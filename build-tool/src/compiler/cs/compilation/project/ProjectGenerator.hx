@@ -5,7 +5,7 @@ import compiler.cs.tools.Logger;
 import haxe.io.BytesOutput;
 import compiler.cs.system.System;
 
-class ProjectGenerator {
+class ProjectGenerator implements ProjectWriter{
 	var system:System;
 	var logger:Logger;
 

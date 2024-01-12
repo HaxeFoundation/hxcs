@@ -31,4 +31,6 @@ class BaseCsCompiler implements CsCompiler{
     function exists(exe:String, checkArgs:Array<String> = null) {
         return this.system.compilerExists(exe, checkArgs);
     }
+
+    public function compile(params:CompilerParameters) {}
 }

@@ -31,4 +31,6 @@ class FakeCsCompiler implements CsCompiler{
 	public function findCompiler(params:CompilerParameters):Bool {
 		return found;
 	}
+
+	public function compile(params:CompilerParameters) {}
 }
