@@ -1,38 +1,45 @@
-package hxcs.tests.compilers;
+package hxcs.tests.compilation.finders;
 
-import haxe.exceptions.NotImplementedException;
+import haxe.PosInfos;
+import compiler.cs.compilation.CompilerFinder;
 import hxcs.fakes.SystemFake;
-import compiler.cs.compilers.CsCompiler;
 import compiler.cs.compilation.preprocessing.CompilerParameters;
 import hxcs.tests.compiler.BaseCompilerTests.CompilationOptions;
+
+import org.hamcrest.Matchers.*;
 
 using hxcs.fakes.SystemFake.FakeFilesAssertions;
 using hxcs.fakes.FakeCompilerTools;
 using StringTools;
 
-class BaseCompilersTest{
+class CompilerFinderBaseTest{
 
-    var csCompiler:CsCompiler;
+    var compilerFinder:CompilerFinder;
     var compilerParams:CompilerParameters;
 
     var fakeSys:SystemFake;
+
+    public function new() {
+    }
 
     @Before
     public function setup() {
         fakeSys = new SystemFake();
         fakeSys.defaultProcess().setExitCode(-1);
 
-        this.csCompiler = makeCompiler();
+        this.compilerFinder = makeCompilerFinder();
     }
 
-    function makeCompiler(): CsCompiler {
-        throw new NotImplementedException('Needs to override makeCompiler function');
+    function makeCompilerFinder(): CompilerFinder {
+        return null;
     }
 
     // -----------------------------------------------------------------------------
 
-    function test_select_compiler(expected:String, ?existent:Array<String>, ?options:CompilationOptions) {
+    function test_select_compiler(expected:String, ?existent:Array<String>, ?options:CompilationOptions, ?pos:PosInfos) {
         setup();
+        requireCompilerFinder(pos);
+
         if(existent == null)
             existent = if(expected != null) [expected] else [];
 
@@ -45,12 +52,17 @@ class BaseCompilersTest{
             throw e;
         }
     }
+
+    function requireCompilerFinder(?pos:PosInfos) {
+        assertThat(compilerFinder, is(notNullValue()), "Missing required compiler finder", pos);
+    }
+
     function do_test_select_compiler(expected:String, ?existent:Array<String>, ?options:Dynamic) {
         givenOptions(options);
         fakeSys.givenCompilers(existent);
 
         // When:
-        var result = csCompiler.findCompiler(compilerParams);
+        var result = compilerFinder.findCompiler(compilerParams);
 
         // Then:
         expected = fakeSys.compilerWithExtension(expected);
@@ -58,9 +70,7 @@ class BaseCompilersTest{
         if(options.hasCompilerCheck != false && expected != null)
             fakeSys.shouldCheckCompiler(expected);
 
-        result.shouldHaveFoundCompiler(expected != null);
-
-        fakeSys.foundCompilerShouldBe(csCompiler.compiler, expected);
+        fakeSys.foundCompilerShouldBe(result, expected);
     }
 
     function givenOptions(options:Null<CompilationOptions>) {

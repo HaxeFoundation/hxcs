@@ -1,21 +1,21 @@
-package hxcs.tests.compilers;
+package hxcs.tests.compilation.finders;
 
-import compiler.cs.compilers.CsCompiler;
-import compiler.cs.compilers.MonoCompiler;
+import compiler.cs.compilation.finders.MonoCompilerFinder;
+import compiler.cs.compilation.CompilerFinder;
 
 using hxcs.fakes.SystemFake.FakeFilesAssertions;
 using hxcs.fakes.FakeCompilerTools;
 using StringTools;
 
-class MonoCompilerTest extends BaseCompilersTest{
+class MonoCompilerFinderTest extends CompilerFinderBaseTest{
 
     @Before
     public override function setup() {
         super.setup();
     }
 
-    override function makeCompiler():CsCompiler {
-        return new MonoCompiler(this.fakeSys);
+    override function makeCompilerFinder():CompilerFinder {
+        return new MonoCompilerFinder(this.fakeSys);
     }
 
     @Test
@@ -28,7 +28,7 @@ class MonoCompilerTest extends BaseCompilersTest{
                 silverlight:true,
                 system: system
             });
-    
+
             //precedence
             test_select_compiler('mcs', ['mcs', 'dmcs', 'gmcs'], { system: system });
             test_select_compiler('dmcs', ['dmcs', 'gmcs'], { system: system });
@@ -37,7 +37,7 @@ class MonoCompilerTest extends BaseCompilersTest{
 
     @Test
     public function select_compiler_with_version() {
-        var compilers = MonoCompiler.compilers();
+        var compilers = MonoCompilerFinder.compilers();
         var exceptMcs = compilers.copy();
         exceptMcs.remove('mcs');
 

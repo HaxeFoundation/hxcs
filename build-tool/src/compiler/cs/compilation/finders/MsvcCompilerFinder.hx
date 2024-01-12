@@ -1,16 +1,12 @@
-package compiler.cs.compilers;
+package compiler.cs.compilation.finders;
 
 import haxe.io.Path;
 import compiler.cs.compilation.preprocessing.CompilerParameters;
 
-class MsvcCompiler extends BaseCsCompiler {
+class MsvcCompilerFinder extends BaseCompilerFinder {
 
-	var compilerName:String="";
-
-	override public function findCompiler(params:CompilerParameters):Bool {
-		findMsvc();
-
-		return this.compiler != null;
+	override public function findCompiler(params:CompilerParameters):Null<String> {
+		return findMsvc();
 	}
 
 	//  ----------------------------------------------------------------------
@@ -19,18 +15,17 @@ class MsvcCompiler extends BaseCsCompiler {
 	private function findMsvc()
 	{
 		if (system.systemName() != "Windows")
-			return;
+			return null;
 
 		log('looking for MSVC directory');
 		//se if it is in path
 		if (exists("csc"))
 		{
-			this.compilerName = "csc";
-			this.compiler     = Path.withExtension(compilerName, 'exe');
 			log('found csc compiler');
+			return Path.withExtension("csc", 'exe');
 		}
 
-		searchCompilerFromWindir();
+		return searchCompilerFromWindir();
 	}
 
 	function searchCompilerFromWindir() {
@@ -44,11 +39,11 @@ class MsvcCompiler extends BaseCsCompiler {
 			var foundPath = searchMsvcIn(Path.join([windir, winsubdir]));
 			if (foundPath != null)
 			{
-				this.compiler = foundPath;
-				this.compilerName = "csc";
-				return;
+				return foundPath;
 			}
 		}
+
+		return null;
 	}
 
 	function searchMsvcIn(path:String) {

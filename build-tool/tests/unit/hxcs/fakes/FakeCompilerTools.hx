@@ -55,15 +55,6 @@ class FakeCompilerTools {
             '"$srcPath" should be copied to "$dstPath"');
     }
 
-
-    public static function shouldHaveFoundCompiler(found:Bool, expected:Bool) {
-        var should = if(expected) "should" else "should not ";
-
-        assertThat(found, equalTo(expected),
-            '$should find compiler'
-        );
-    }
-
     public static function foundCompilerShouldBe(fakeSys:SystemFake, found:String, expected:String) {
         assertThat(found, is(equalTo(expected)),
             'selected compiler does not match');

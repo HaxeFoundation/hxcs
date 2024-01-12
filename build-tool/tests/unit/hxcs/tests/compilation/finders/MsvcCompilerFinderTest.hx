@@ -1,22 +1,22 @@
-package hxcs.tests.compilers;
+package hxcs.tests.compilation.finders;
 
-import compiler.cs.compilers.CsCompiler;
+import compiler.cs.compilation.finders.MsvcCompilerFinder;
+import compiler.cs.compilation.CompilerFinder;
 import haxe.io.Path;
-import compiler.cs.compilers.MsvcCompiler;
 
 using hxcs.fakes.SystemFake.FakeFilesAssertions;
 using hxcs.fakes.FakeCompilerTools;
 using StringTools;
 
-class MsvcCompilerTest extends BaseCompilersTest{
+class MsvcCompilerFinderTest extends CompilerFinderBaseTest{
 
     @Before
     public override function setup() {
         super.setup();
     }
 
-    override function makeCompiler():CsCompiler {
-        return new MsvcCompiler(this.fakeSys);
+    override function makeCompilerFinder():CompilerFinder {
+        return new MsvcCompilerFinder(this.fakeSys);
     }
 
     @Test

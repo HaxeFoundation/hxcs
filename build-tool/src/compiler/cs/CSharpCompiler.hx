@@ -1,8 +1,6 @@
 package compiler.cs;
 
-import compiler.cs.compilers.CustomCompiler;
-import compiler.cs.compilers.MonoCompiler;
-import compiler.cs.compilers.MsvcCompiler;
+import compiler.cs.compilers.CompilersBuilder;
 import compiler.cs.compilers.CsCompiler;
 import compiler.cs.compilation.CompilerSelector;
 import compiler.cs.compilation.building.DefaultCompilerRunner;
@@ -43,10 +41,12 @@ class CSharpCompiler extends Compiler
 		this.system = if(system != null) system else new StdSystem();
 		this.logger = if(logger != null) logger else new Logger();
 
+		var builder = CompilersBuilder.builder(this.system, this.logger);
+
 		this.compilers = [
-			new CustomCompiler(this.system, this.logger),
-			new MsvcCompiler(this.system, this.logger),
-			new MonoCompiler(this.system, this.logger)
+			builder.customCompiler(),
+			builder.msvcCompiler(),
+			builder.monoCompiler()
 		];
 
 		this.csSelector	   = new CompilerSelector();	

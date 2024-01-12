@@ -1,22 +1,21 @@
-package compiler.cs.compilers;
+package compiler.cs.compilation.finders;
 
 import compiler.cs.compilation.preprocessing.CompilerParameters;
 
 using compiler.cs.compilers.CompilerTools;
 
 
-class MonoCompiler extends BaseCsCompiler{
+class MonoCompilerFinder extends BaseCompilerFinder {
 	public static function compilers() return ['mcs', 'dmcs', 'smcs', 'gmcs'];
 
+	public override function findCompiler(params:CompilerParameters):Null<String> {
+		var compiler = findMonoCompiler(params.silverlight, params.version);
 
-	public override function findCompiler(params:CompilerParameters): Bool {
-		var found = findMonoCompiler(params.silverlight, params.version);
-
-		if(found != null){
-			this.compiler = system.withSystemExtension(found, ['Windows' => 'bat']);
+		if(compiler != null){
+			compiler = system.withSystemExtension(compiler, ['Windows' => 'bat']);
 		}
 
-		return compiler != null;
+		return compiler;
 	}
 
 	function findMonoCompiler(?silverlight:Bool, ?version:Int) {

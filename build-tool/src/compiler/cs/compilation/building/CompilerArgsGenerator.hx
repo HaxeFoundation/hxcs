@@ -4,7 +4,7 @@ import compiler.cs.compilation.preprocessing.CompilerParameters;
 import compiler.cs.tools.Logger;
 import compiler.cs.system.System;
 
-class CompilerArgsGenerator {
+class CompilerArgsGenerator implements ArgumentsGenerator{
     var system:System;
     var logger:Logger;
 
