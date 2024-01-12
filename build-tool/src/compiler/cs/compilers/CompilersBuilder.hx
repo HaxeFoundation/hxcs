@@ -1,5 +1,7 @@
 package compiler.cs.compilers;
 
+import compiler.cs.compilation.configurators.LocalLibsCloner;
+import compiler.cs.compilation.classic.ClassicCsBuilder;
 import compiler.cs.compilation.finders.CustomCompilerFinder;
 import compiler.cs.compilation.finders.MsvcCompilerFinder;
 import compiler.cs.compilation.building.CompilerArgsGenerator;
@@ -49,7 +51,8 @@ class CompilersBuilder {
             finder,
             new ProjectGenerator(sys, log),
             new CompilerArgsGenerator(sys,log),
-            null
+            new ClassicCsBuilder(sys, log),
+            new LocalLibsCloner(sys, log)
         );
     }
 }

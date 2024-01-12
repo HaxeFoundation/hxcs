@@ -1,5 +1,6 @@
 package hxcs.tests.compilers;
 
+import compiler.cs.compilation.EnvironmentConfigurator;
 import hxcs.fakes.FakeBuilder;
 import hxcs.fakes.FakeArgumentsGenerator;
 import hxcs.fakes.FakeProjectWriter;
@@ -13,6 +14,38 @@ import org.hamcrest.Matchers.*;
 import hxcs.helpers.ExceptionAssertions.*;
 
 
+class FakeEnvironmentConfigurator implements EnvironmentConfigurator{
+	public var capturedParameters:Null<CompilerParameters> = null;
+	public var replacedParameters:Null<CompilerParameters> = null;
+
+	var configuredCalled:Bool = false;
+
+	public function new() {
+	}
+
+	public function configure(params:CompilerParameters):CompilerParameters {
+		configuredCalled = true;
+		this.capturedParameters = params;
+
+		if(replacedParameters != null){
+			return replacedParameters;
+		}
+
+		return capturedParameters;
+	}
+
+	public function replaceParametersWith(params:CompilerParameters) {
+		this.replacedParameters = params;
+	}
+
+	public function assertCalledWith(expected:CompilerParameters) {
+		assertThat(configuredCalled, is(true), "Configure was not called");
+		assertThat(capturedParameters, equalTo(expected),
+			"CompilerParameters used in configuration is not what expected");
+	}
+}
+
+
 class CompilerPipelineTest{
 	var compiler:CsCompiler;
 
@@ -20,6 +53,7 @@ class CompilerPipelineTest{
 	var fakeProjWriter:FakeProjectWriter;
 	var fakeArgsGenerator:FakeArgumentsGenerator;
 	var fakeBuilder:FakeBuilder;
+	var fakeConfigurer:FakeEnvironmentConfigurator;
 
 	var found:Bool;
 	var buildParams:CompilerParameters;
@@ -34,9 +68,10 @@ class CompilerPipelineTest{
 		fakeProjWriter = new FakeProjectWriter();
 		fakeArgsGenerator = new FakeArgumentsGenerator();
 		fakeBuilder = new FakeBuilder();
+		fakeConfigurer = new FakeEnvironmentConfigurator();
 
 		compiler = new CompilerPipeline(
-			fakeFinder, fakeProjWriter, fakeArgsGenerator, fakeBuilder
+			fakeFinder, fakeProjWriter, fakeArgsGenerator, fakeBuilder, fakeConfigurer
 		);
 	}
 
@@ -100,10 +135,33 @@ class CompilerPipelineTest{
 			foundCompiler(), genArgs(), buildParams);
 	}
 
+	@Test
+	public function configure_environment() {
+		given_a_compiler_was_found();
+
+		given_configurer_changes_parameter_to(paramsWith({
+			main: "otherMain"
+		}));
+
+		when_compiling_with(anyParam());
+
+		//Then:
+		fakeConfigurer.assertCalledWith(buildParams);
+
+		//And:
+		fakeBuilder.projectShouldBeBuiltWith(
+			foundCompiler(), genArgs(), fakeConfigurer.replacedParameters
+		);
+	}
+
 	// -----------------------------------------------------------
 
 	function anyParam(): CompilerParameters {
 		return {};
+	}
+
+	function paramsWith(param:CompilerParameters) {
+		return param.clone();
 	}
 
 	function anyCompiler() {
@@ -127,6 +185,10 @@ class CompilerPipelineTest{
 		fakeFinder.findReturns(anyCompiler());
 
 		when_finding_compiler();
+	}
+
+	function given_configurer_changes_parameter_to(params:CompilerParameters) {
+		fakeConfigurer.replaceParametersWith(params);
 	}
 
 	function when_finding_compiler() {

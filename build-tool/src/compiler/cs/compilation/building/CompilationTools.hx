@@ -9,9 +9,13 @@ using compiler.cs.system.SystemTools;
 
 
 class CompilationTools {
-    public static function copyLibs(
-        system:System, params:CompilerParameters, ?logger:Logger): CompilerParameters
-    {
+
+	/**
+		Copy libs with 'hint' to output dir.
+	**/
+	public static function copyLocalLibs(
+		system:System, params:CompilerParameters, ?logger:Logger): CompilerParameters
+	{
 		var copyParam = params.clone();
 		copyParam.libs = [];
 		var data = params.data;
@@ -36,7 +40,7 @@ class CompilationTools {
 		return copyParam;
 	}
 
-    static function log(text:String, logger:Null<Logger>) {
-        logger.log(text);
-    }
+	static function log(text:String, logger:Null<Logger>) {
+		logger.log(text);
+	}
 }

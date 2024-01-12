@@ -10,6 +10,7 @@ import hxcs.tests.compiler.CompilerSelectorTest;
 import hxcs.tests.compilation.finders.MsvcCompilerFinderTest;
 import hxcs.tests.compilation.finders.CompilerFinderBaseTest;
 import hxcs.tests.compilation.finders.MonoCompilerFinderTest;
+import hxcs.tests.compilation.classic.ClassicCsBuilderTest;
 
 /**
  * Auto generated Test Suite for MassiveUnit.
@@ -31,5 +32,6 @@ class TestSuite extends massive.munit.TestSuite
 		add(hxcs.tests.compilation.finders.MsvcCompilerFinderTest);
 		add(hxcs.tests.compilation.finders.CompilerFinderBaseTest);
 		add(hxcs.tests.compilation.finders.MonoCompilerFinderTest);
+		add(hxcs.tests.compilation.classic.ClassicCsBuilderTest);
 	}
 }

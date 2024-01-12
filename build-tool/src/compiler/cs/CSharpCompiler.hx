@@ -3,10 +3,7 @@ package compiler.cs;
 import compiler.cs.compilers.CompilersBuilder;
 import compiler.cs.compilers.CsCompiler;
 import compiler.cs.compilation.CompilerSelector;
-import compiler.cs.compilation.building.DefaultCompilerRunner;
-import compiler.cs.compilation.building.CompilerRunner;
 import compiler.cs.compilation.preprocessing.CompilerParameters;
-import compiler.cs.compilation.project.ProjectGenerator;
 import compiler.cs.compilation.preprocessing.ParametersParser;
 import compiler.cs.tools.Logger;
 import compiler.Compiler;
@@ -30,10 +27,8 @@ class CSharpCompiler extends Compiler
 
 	var compilers    :Array<CsCompiler>;
 	var csSelector	 :CompilerSelector;
-	var projGenerator:ProjectGenerator;
 
 	var params :CompilerParameters;
-	var builder:CompilerRunner;
 
 	public function new(cmd:CommandLine, ?system:System, ?logger:Logger)
 	{
@@ -51,16 +46,15 @@ class CSharpCompiler extends Compiler
 
 		this.csSelector	   = new CompilerSelector();	
 		this.paramParser   = new ParametersParser(this.system);
-		this.projGenerator = new ProjectGenerator(this.system, this.logger);
 	}
 
 	override public function compile(data:Data):Void
 	{
-		preProcess(data);
+		var params = preProcess(data);
 		createBuildDirectory();
-		findCompiler();
-		writeProject();
-		doCompilation();
+
+		var compiler = findCompiler();
+		compiler.compile(params);
 	}
 
 	function preProcess(data:Data) {
@@ -77,17 +71,6 @@ class CSharpCompiler extends Compiler
 	}
 
 	function findCompiler(){
-		var compiler = this.csSelector.selectFrom(compilers, params);
-
-		this.builder = new DefaultCompilerRunner(
-			compiler.compiler, params, system, logger);
-	}
-
-	function writeProject(){
-		this.projGenerator.writeProject(params);
-	}
-	
-	function doCompilation() {
-		builder.compile(params);
+		return this.csSelector.selectFrom(compilers, params);
 	}
 }
