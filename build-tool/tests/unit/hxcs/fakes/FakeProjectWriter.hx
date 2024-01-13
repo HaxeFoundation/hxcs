@@ -1,8 +1,8 @@
 package hxcs.fakes;
 
 import haxe.PosInfos;
-import compiler.cs.compilation.preprocessing.CompilerParameters;
-import compiler.cs.compilation.ProjectWriter;
+import compiler.cs.compilation.CompilerParameters;
+import compiler.cs.compilation.pipeline.ProjectWriter;
 
 import org.hamcrest.Matchers.*;
 

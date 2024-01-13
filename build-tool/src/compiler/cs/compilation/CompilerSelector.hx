@@ -1,7 +1,6 @@
 package compiler.cs.compilation;
 
-import compiler.cs.compilation.preprocessing.CompilerParameters;
-import compiler.cs.compilers.CsCompiler;
+import compiler.cs.compilation.CompilerParameters;
 
 
 class CompilerSelector {

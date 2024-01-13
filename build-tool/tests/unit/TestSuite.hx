@@ -1,16 +1,16 @@
 import massive.munit.TestSuite;
 
-import hxcs.tests.compilers.CompilerPipelineTest;
 import hxcs.tests.system.SystemToolsTest;
+import hxcs.tests.implementation.classic.finders.MsvcCompilerFinderTest;
+import hxcs.tests.implementation.classic.finders.CompilerFinderBaseTest;
+import hxcs.tests.implementation.classic.finders.MonoCompilerFinderTest;
+import hxcs.tests.implementation.classic.ClassicCsBuilderTest;
 import hxcs.tests.compiler.ProjectWriterTest;
 import hxcs.tests.compiler.CsProjWriterTest;
 import hxcs.tests.compiler.CompilerTest;
 import hxcs.tests.compiler.PreProcessCompilerTest;
-import hxcs.tests.compiler.CompilerSelectorTest;
-import hxcs.tests.compilation.finders.MsvcCompilerFinderTest;
-import hxcs.tests.compilation.finders.CompilerFinderBaseTest;
-import hxcs.tests.compilation.finders.MonoCompilerFinderTest;
-import hxcs.tests.compilation.classic.ClassicCsBuilderTest;
+import hxcs.tests.compilation.CompilerPipelineTest;
+import hxcs.tests.compilation.CompilerSelectorTest;
 
 /**
  * Auto generated Test Suite for MassiveUnit.
@@ -22,16 +22,16 @@ class TestSuite extends massive.munit.TestSuite
 	{
 		super();
 
-		add(hxcs.tests.compilers.CompilerPipelineTest);
 		add(hxcs.tests.system.SystemToolsTest);
+		add(hxcs.tests.implementation.classic.finders.MsvcCompilerFinderTest);
+		add(hxcs.tests.implementation.classic.finders.CompilerFinderBaseTest);
+		add(hxcs.tests.implementation.classic.finders.MonoCompilerFinderTest);
+		add(hxcs.tests.implementation.classic.ClassicCsBuilderTest);
 		add(hxcs.tests.compiler.ProjectWriterTest);
 		add(hxcs.tests.compiler.CsProjWriterTest);
 		add(hxcs.tests.compiler.CompilerTest);
 		add(hxcs.tests.compiler.PreProcessCompilerTest);
-		add(hxcs.tests.compiler.CompilerSelectorTest);
-		add(hxcs.tests.compilation.finders.MsvcCompilerFinderTest);
-		add(hxcs.tests.compilation.finders.CompilerFinderBaseTest);
-		add(hxcs.tests.compilation.finders.MonoCompilerFinderTest);
-		add(hxcs.tests.compilation.classic.ClassicCsBuilderTest);
+		add(hxcs.tests.compilation.CompilerPipelineTest);
+		add(hxcs.tests.compilation.CompilerSelectorTest);
 	}
 }

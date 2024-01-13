@@ -1,10 +1,10 @@
 package hxcs.tests.compiler;
 
-import compiler.cs.compilation.preprocessing.CompilerParameters;
+import compiler.cs.implementation.classic.CsProjWriter;
+import compiler.cs.compilation.CompilerParameters;
 import hxcs.helpers.DataGenerator;
 import haxe.io.BytesOutput;
 import hxcs.fakes.SystemFake;
-import compiler.cs.CsProjWriter;
 
 import org.hamcrest.Matchers.*;
 

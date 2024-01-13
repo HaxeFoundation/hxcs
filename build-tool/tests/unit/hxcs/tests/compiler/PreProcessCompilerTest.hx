@@ -1,7 +1,7 @@
 package hxcs.tests.compiler;
 
-import compiler.cs.compilation.preprocessing.CompilerParameters;
-import compiler.cs.compilation.preprocessing.ParametersParser;
+import compiler.cs.implementation.common.ParametersParser;
+import compiler.cs.compilation.CompilerParameters;
 import massive.munit.Assert;
 import haxe.io.Path;
 

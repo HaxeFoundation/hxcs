@@ -1,10 +1,10 @@
 package compiler.cs;
 
-import compiler.cs.compilers.CompilersBuilder;
-import compiler.cs.compilers.CsCompiler;
+import compiler.cs.implementation.classic.CompilersBuilder;
+import compiler.cs.implementation.common.ParametersParser;
+import compiler.cs.compilation.CsCompiler;
 import compiler.cs.compilation.CompilerSelector;
-import compiler.cs.compilation.preprocessing.CompilerParameters;
-import compiler.cs.compilation.preprocessing.ParametersParser;
+import compiler.cs.compilation.CompilerParameters;
 import compiler.cs.tools.Logger;
 import compiler.Compiler;
 

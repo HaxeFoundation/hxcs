@@ -1,7 +1,7 @@
 package hxcs.fakes;
 
-import compiler.cs.compilation.preprocessing.CompilerParameters;
-import compiler.cs.compilation.CsBuilder;
+import compiler.cs.compilation.pipeline.CsBuilder;
+import compiler.cs.compilation.CompilerParameters;
 import org.hamcrest.Matchers.*;
 
 

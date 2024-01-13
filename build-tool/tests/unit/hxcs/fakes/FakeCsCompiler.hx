@@ -1,7 +1,7 @@
 package hxcs.fakes;
 
-import compiler.cs.compilation.preprocessing.CompilerParameters;
-import compiler.cs.compilers.CsCompiler;
+import compiler.cs.compilation.CompilerParameters;
+import compiler.cs.compilation.CsCompiler;
 
 @:structInit
 class FakeCsCompiler implements CsCompiler{
