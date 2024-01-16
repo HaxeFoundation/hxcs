@@ -1,10 +1,9 @@
-package hxcs.tests.compiler;
+package hxcs.tests.implementation.common;
 
-import compiler.cs.implementation.classic.CsProjWriter;
+import compiler.cs.implementation.common.CsProjWriter;
 import compiler.cs.compilation.CompilerParameters;
 import hxcs.helpers.DataGenerator;
 import haxe.io.BytesOutput;
-import hxcs.fakes.SystemFake;
 
 import org.hamcrest.Matchers.*;
 
@@ -27,7 +26,6 @@ class CsProjWriterTest {
 	var writer:CsProjWriter;
 	var output:BytesOutput;
 	var params:CompilerParameters = null;
-	var system:SystemFake;
 
 	var writenProject:String;
 
@@ -36,7 +34,6 @@ class CsProjWriterTest {
 
 	@Before
 	public function setup() {
-		system = new SystemFake();
 		output = new BytesOutput();
 		writer = new CsProjWriter(output);
 	}
@@ -77,42 +74,81 @@ class CsProjWriterTest {
 		});
 
 		//when:
-		writingProject();
+		when_writting_project();
 
 		//then:
 		var type = params.islibrary ? 'Library' : 'Exe';
-		projectShouldContain('<OutputType>$type</OutputType>');
-		projectShouldContain('<AssemblyName>${params.name}</AssemblyName>');
-		projectShouldContain('<TargetFrameworkVersion>v${params.versionStr}</TargetFrameworkVersion>');
+		project_should_contain('<OutputType>$type</OutputType>');
+		project_should_contain('<AssemblyName>${params.name}</AssemblyName>');
+		project_should_contain('<TargetFrameworkVersion>v${params.versionStr}</TargetFrameworkVersion>');
 
 		if(params.unsafe){
-			projectShouldContain('<AllowUnsafeBlocks>true</AllowUnsafeBlocks>');
+			project_should_contain('<AllowUnsafeBlocks>true</AllowUnsafeBlocks>');
 		}
 
 		for(lib in regularLibs.keys()){
-			projectShouldContain('<Reference Include="${lib}" />');
+			project_should_contain('<Reference Include="${lib}" />');
 		}
 		for(lib=>hint in localLibs.keyValueIterator()){
-			projectShouldContain('<Reference Include="${lib}">');
-			projectShouldContain('<HintPath>${hint}</HintPath>');
+			project_should_contain('<Reference Include="${lib}">');
+			project_should_contain('<HintPath>${hint}</HintPath>');
 		}
 	}
 
-	function projectShouldContain(text:String) {
-		assertThat(writenProject, containsString(text),
-			'Missing expected text on written project');
+
+	@Test
+	public function write_project_for_dotnet_core() {
+		givenParameters({
+			dotnetCore: true,
+			version:80
+		});
+
+		// when_writting_project();
+		when_writting_project();
+
+		project_should_contain_tag("TargetFramework", "net8.0");
+		project_should_not_contain("<TargetFrameworkVersion>");
+		project_should_not_contain("<TargetFrameworkProfile>");
+
+		project_should_contain('<Project Sdk="Microsoft.NET.Sdk">');
+
+		project_should_contain_tag("ImplicitUsings", "enable");
+		project_should_contain_tag("Nullable","enable");
+		project_should_contain_tag("EnableDefaultCompileItems", "false");
+
+		project_should_not_contain('Include="System"');
+		project_should_not_contain('Project="$(MSBuildToolsPath)\\Microsoft.CSharp.targets"');
 	}
+
+	// ----------------------------------------------------------------------
 
 	function givenParameters(params:CompilerParameters) {
 		var data = DataGenerator.defaultData();
 
 		this.params = params;
 		this.params.data = data;
+
+		if(this.params.libs == null){
+			this.params.libs = [];
+		}
 	}
 
-	function writingProject() {
+	function when_writting_project() {
 		writer.write(params);
 
 		writenProject = output.getBytes().toString();
+	}
+
+	function project_should_contain_tag(tag:String, value:String) {
+		project_should_contain('<$tag>$value</$tag>');
+	}
+
+	function project_should_contain(text:String) {
+		assertThat(writenProject, containsString(text),
+			'Missing expected text on written project');
+	}
+
+	function project_should_not_contain(text:String) {
+		assertThat(writenProject, not(containsString(text)));
 	}
 }

@@ -1,4 +1,4 @@
-package compiler.cs.implementation.classic;
+package compiler.cs.implementation.common;
 
 import compiler.cs.compilation.CompilerParameters;
 import haxe.io.Output;
@@ -25,6 +25,7 @@ class CsProjWriter
 		stream.writeString(template.execute( {
 			outputType : (params.dll ? "Library" : "Exe"),
 			name : params.name,
+			dotnetCore: params.dotnetCore,
 			targetFramework : versionStr,
 			unsafe : params.unsafe,
 			refs : params.libs,

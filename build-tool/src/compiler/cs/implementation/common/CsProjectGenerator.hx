@@ -1,4 +1,4 @@
-package compiler.cs.implementation.classic;
+package compiler.cs.implementation.common;
 
 import compiler.cs.compilation.pipeline.ProjectWriter;
 import compiler.cs.compilation.CompilerParameters;
@@ -6,7 +6,7 @@ import compiler.cs.tools.Logger;
 import haxe.io.BytesOutput;
 import compiler.cs.system.System;
 
-class ProjectGenerator implements ProjectWriter{
+class CsProjectGenerator implements ProjectWriter{
 	var system:System;
 	var logger:Logger;
 

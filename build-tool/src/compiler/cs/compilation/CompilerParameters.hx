@@ -8,6 +8,11 @@ class CompilerParameters{
 	@:optional
 	public var data(default, default):Data;
 
+
+	/* Whether to use dotnet core properties. */
+	@:optional
+	public var dotnetCore(default, default):Null<Bool>;
+
 	@:optional
 	public var version(default, default):Null<Int>;
 	public var silverlight(default, default):Bool = false;

@@ -1,13 +1,16 @@
 package compiler.cs.implementation.classic;
 
-import compiler.cs.compilation.pipeline.CompilerPipeline;
-import compiler.cs.compilation.pipeline.CompilerFinder;
-import compiler.cs.implementation.classic.finders.MsvcCompilerFinder;
 import compiler.cs.compilation.CsCompiler;
-import compiler.cs.implementation.classic.finders.MonoCompilerFinder;
+import compiler.cs.compilation.pipeline.CompilerFinder;
+import compiler.cs.compilation.pipeline.CompilerPipeline;
 import compiler.cs.implementation.classic.finders.CustomCompilerFinder;
-import compiler.cs.tools.Logger;
+import compiler.cs.implementation.classic.finders.MonoCompilerFinder;
+import compiler.cs.implementation.classic.finders.MsvcCompilerFinder;
+import compiler.cs.implementation.common.CsProjectGenerator;
+
 import compiler.cs.system.System;
+import compiler.cs.tools.Logger;
+
 
 class CompilersBuilder {
     var sys:System;
@@ -47,7 +50,7 @@ class CompilersBuilder {
     function build(finder:CompilerFinder) {
         return new CompilerPipeline(
             finder,
-            new ProjectGenerator(sys, log),
+            new CsProjectGenerator(sys, log),
             new CompilerArgsGenerator(sys,log),
             new ClassicCsBuilder(sys, log),
             new LocalLibsCloner(sys, log)
