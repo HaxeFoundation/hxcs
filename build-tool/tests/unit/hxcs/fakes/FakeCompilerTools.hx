@@ -60,8 +60,11 @@ class FakeCompilerTools {
             'selected compiler does not match');
     }
 
-    public static function shouldCheckCompiler(fakeSys:SystemFake, compiler:String) {
-        shouldUseCompilerWith(fakeSys, compiler, ['-help'], true);
+    public static function shouldCheckCompiler(fakeSys:SystemFake, compiler:String, ?args:Array<String>) {
+        if(args == null)
+            args = ['-help'];
+
+        shouldUseCompilerWith(fakeSys, compiler, args, true);
     }
 
     public static function shouldUseCompilerWith(

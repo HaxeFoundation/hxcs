@@ -1,8 +1,9 @@
 import massive.munit.TestSuite;
 
 import hxcs.tests.system.SystemToolsTest;
+import hxcs.tests.implementation.CompilerFinderBaseTest;
+import hxcs.tests.implementation.dotnet.DotnetFinderTest;
 import hxcs.tests.implementation.classic.finders.MsvcCompilerFinderTest;
-import hxcs.tests.implementation.classic.finders.CompilerFinderBaseTest;
 import hxcs.tests.implementation.classic.finders.MonoCompilerFinderTest;
 import hxcs.tests.implementation.classic.ClassicCsBuilderTest;
 import hxcs.tests.compiler.ProjectWriterTest;
@@ -23,8 +24,9 @@ class TestSuite extends massive.munit.TestSuite
 		super();
 
 		add(hxcs.tests.system.SystemToolsTest);
+		add(hxcs.tests.implementation.CompilerFinderBaseTest);
+		add(hxcs.tests.implementation.dotnet.DotnetFinderTest);
 		add(hxcs.tests.implementation.classic.finders.MsvcCompilerFinderTest);
-		add(hxcs.tests.implementation.classic.finders.CompilerFinderBaseTest);
 		add(hxcs.tests.implementation.classic.finders.MonoCompilerFinderTest);
 		add(hxcs.tests.implementation.classic.ClassicCsBuilderTest);
 		add(hxcs.tests.compiler.ProjectWriterTest);
