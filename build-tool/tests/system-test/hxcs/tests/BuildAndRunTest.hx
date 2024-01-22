@@ -33,11 +33,29 @@ class BuildAndRunTest {
     }
 
     @Test
+    public function embeddedResourceExample() {
+        var resPath  = resourcePath("resource_file.txt");
+
+        assertThat(FileSystem.exists(resPath), is(true),
+            'Resource file $resPath should exist');
+
+        testBuildAndRunExample("EmbeddedResource", "Resource file example\n", {
+            haxe: ["--resource",  '$resPath@resource_file']
+        });
+    }
+
+    @Test
     public function fileSystemAccess() {
         testBuildAndRunExample("Files", "Ok\n", {
             haxe: ['--lib', 'munit', '--lib', 'hamcrest'],
             program: [buildDir]
         });
+    }
+
+// --------------------------------------------------------------------
+
+    function resourcePath(resFile:String) {
+        return Path.join(['resources', resFile]);
     }
 
     function testBuildAndRunExample(example: String, expectedOutput: String, ?args:Args) {
@@ -62,7 +80,7 @@ class BuildAndRunTest {
         var packageParts = main.split(".");
         var programName  = packageParts[packageParts.length - 1];
 
-        var outDir  = transpile(main, args.haxe);
+        var outDir  = transpile(main, args);
         var bin     = compile(outDir, programName);
 
         var programArgs = if(args.program == null) [] else args.program;
@@ -70,8 +88,8 @@ class BuildAndRunTest {
         return checkCommand(bin, programArgs);
     }
 
-    function transpile(program:String, ?haxeArgs:Array<String>): String {
-        haxeArgs = if(haxeArgs == null) [] else haxeArgs;
+    function transpile(program:String, args:Args): String {
+        var haxeArgs = if(args.haxe == null) [] else args.haxe;
 
         var outDir = Path.join([buildDir, 'examples', program]);
         FileSystem.createDirectory(outDir);

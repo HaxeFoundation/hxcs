@@ -46,7 +46,7 @@ class CompilerArgsGenerator implements ArgumentsGenerator{
 		}
 		for (res in data.resources) {
 			res = haxe.io.Path.escape(res, true);
-			// res = haxe.crypto.Base64.encode(haxe.io.Bytes.ofString(res));
+
 			args.push('/res:src' + delim + 'Resources' + delim + res + ",src.Resources." + res);
 		}
 		for (file in data.modules)

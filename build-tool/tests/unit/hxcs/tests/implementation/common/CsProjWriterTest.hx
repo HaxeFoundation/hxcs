@@ -1,5 +1,9 @@
 package hxcs.tests.implementation.common;
 
+import haxe.io.Bytes;
+import haxe.crypto.Base64;
+import haxe.io.Path;
+import hxcs.helpers.CompilerParametersGenerator;
 import compiler.cs.implementation.common.CsProjWriter;
 import compiler.cs.compilation.CompilerParameters;
 import hxcs.helpers.DataGenerator;
@@ -53,6 +57,41 @@ class CsProjWriterTest {
 			unsafe: false
 		});
 	}
+
+	@Test
+	public function include_resources() {
+		test_include_resources(true);
+		test_include_resources(false);
+	}
+
+	public function test_include_resources(useDotnetCore:Bool) {
+		setup();
+
+		var resources = [
+			'resource1', 'resource2', 'resource3'
+		];
+		var expected_resources = [
+			for(res in resources) if(useDotnetCore) res else Base64.encode(Bytes.ofString(res))
+		];
+
+		givenParameters({
+			name: 'example',
+			data: DataGenerator.dataWith({
+				resources: resources
+			}),
+			dotnetCore: useDotnetCore
+		});
+
+		when_writting_project();
+
+		for (res in expected_resources){
+			var resPath = Path.join(['src', 'Resources', res]);
+			project_should_contain(
+				'<EmbeddedResource Include="$resPath"'
+			);
+		}
+	}
+
 	function test_write_project(params:WriteProjectParams){
 		setup();
 
@@ -123,14 +162,7 @@ class CsProjWriterTest {
 	// ----------------------------------------------------------------------
 
 	function givenParameters(params:CompilerParameters) {
-		var data = DataGenerator.defaultData();
-
-		this.params = params;
-		this.params.data = data;
-
-		if(this.params.libs == null){
-			this.params.libs = [];
-		}
+		this.params = CompilerParametersGenerator.parametersWith(params);
 	}
 
 	function when_writting_project() {

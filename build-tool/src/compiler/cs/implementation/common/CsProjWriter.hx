@@ -1,9 +1,12 @@
 package compiler.cs.implementation.common;
 
 import compiler.cs.compilation.CompilerParameters;
+import haxe.io.Bytes;
 import haxe.io.Output;
+import haxe.io.Path;
 import haxe.Resource;
 import haxe.Template;
+import haxe.crypto.Base64;
 
 using Lambda;
 
@@ -30,8 +33,14 @@ class CsProjWriter
 			unsafe : params.unsafe,
 			refs : params.libs,
 			srcs : params.data.modules.map(function(m) return "src\\" + m.path.split(".").join("\\") + ".cs"),
-			res : params.data.resources.map(function(res) return "src\\Resources\\" + haxe.crypto.Base64.encode(haxe.io.Bytes.ofString(res)))
+			res : params.data.resources.map(function(res) return resourcePath(res, params))
 		} ));
+	}
+
+	function resourcePath(res:String, params:CompilerParameters) {
+		var resource = (params.dotnetCore) ? res : Base64.encode(Bytes.ofString(res));
+
+		return Path.join(["src", "Resources", resource]);
 	}
 
 }
