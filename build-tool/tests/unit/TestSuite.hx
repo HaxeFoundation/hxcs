@@ -2,11 +2,14 @@ import massive.munit.TestSuite;
 
 import hxcs.tests.system.SystemToolsTest;
 import hxcs.tests.implementation.CompilerFinderBaseTest;
+import hxcs.tests.implementation.dotnet.DotnetArgsGeneratorTest;
 import hxcs.tests.implementation.dotnet.DotnetFinderTest;
 import hxcs.tests.implementation.common.CsProjWriterTest;
+import hxcs.tests.implementation.classic.ClassicArgsGeneratorTest;
 import hxcs.tests.implementation.classic.finders.MsvcCompilerFinderTest;
 import hxcs.tests.implementation.classic.finders.MonoCompilerFinderTest;
 import hxcs.tests.implementation.classic.ClassicCsBuilderTest;
+import hxcs.tests.implementation.ArgsGeneratorBaseTest;
 import hxcs.tests.compiler.ProjectWriterTest;
 import hxcs.tests.compiler.CompilerTest;
 import hxcs.tests.compiler.PreProcessCompilerTest;
@@ -25,11 +28,14 @@ class TestSuite extends massive.munit.TestSuite
 
 		add(hxcs.tests.system.SystemToolsTest);
 		add(hxcs.tests.implementation.CompilerFinderBaseTest);
+		add(hxcs.tests.implementation.dotnet.DotnetArgsGeneratorTest);
 		add(hxcs.tests.implementation.dotnet.DotnetFinderTest);
 		add(hxcs.tests.implementation.common.CsProjWriterTest);
+		add(hxcs.tests.implementation.classic.ClassicArgsGeneratorTest);
 		add(hxcs.tests.implementation.classic.finders.MsvcCompilerFinderTest);
 		add(hxcs.tests.implementation.classic.finders.MonoCompilerFinderTest);
 		add(hxcs.tests.implementation.classic.ClassicCsBuilderTest);
+		add(hxcs.tests.implementation.ArgsGeneratorBaseTest);
 		add(hxcs.tests.compiler.ProjectWriterTest);
 		add(hxcs.tests.compiler.CompilerTest);
 		add(hxcs.tests.compiler.PreProcessCompilerTest);

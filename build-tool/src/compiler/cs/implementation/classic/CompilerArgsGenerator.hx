@@ -5,6 +5,8 @@ import compiler.cs.compilation.CompilerParameters;
 import compiler.cs.tools.Logger;
 import compiler.cs.system.System;
 
+using compiler.cs.tools.ParametersTools;
+
 class CompilerArgsGenerator implements ArgumentsGenerator{
 	var system:System;
 	var logger:Logger;
@@ -16,7 +18,7 @@ class CompilerArgsGenerator implements ArgumentsGenerator{
 
 	@:access(haxe.io.Path.escape)
 	public function generateArgs(params: CompilerParameters) {
-		var localLibs = if(params == null) [] else [
+		var localLibs = if(params == null || params.libs == null) [] else [
 			for(lib in params.libs) if(lib.hint != null) lib.hint
 		];
 
@@ -34,11 +36,8 @@ class CompilerArgsGenerator implements ArgumentsGenerator{
 		if(params.arch != null)
 			args.push('/platform:${params.arch}');
 		log('preparing cmd arguments:  ${args.join(" ")}');
-		if (data.main != null && !params.dll) {
-			var idx = data.main.lastIndexOf(".");
-			var namespace = data.main.substring(0, idx + 1);
-			var main = data.main.substring(idx + 1);
-			args.push('/main:' + namespace + (main == "Main" ? "EntryPoint__Main" : main));
+		if (params.main != null && !params.dll) {
+			args.push('/main:' + params.mainClass());
 		}
 		for (libpath in localLibs)
 		{

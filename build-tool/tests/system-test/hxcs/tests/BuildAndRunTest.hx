@@ -10,7 +10,8 @@ import org.hamcrest.Matchers.*;
 
 typedef Args = {
     ?haxe   : Array<String>,
-    ?program: Array<String>
+    ?program: Array<String>,
+    ?classpaths: Array<String>
 }
 
 class BuildAndRunTest {
@@ -30,6 +31,14 @@ class BuildAndRunTest {
     @Test
     public function simpleExample() {
         testBuildAndRunExample("Hello", "Hello World!\n");
+    }
+
+    @Test
+    public function mainClassExample() {
+        testBuildAndRunExample("Main", "Main class\n");
+        testBuildAndRun("Main", "Ok!\n", {
+            classpaths: ["./nopackage"]
+        });
     }
 
     @Test
@@ -59,7 +68,9 @@ class BuildAndRunTest {
     }
 
     function testBuildAndRunExample(example: String, expectedOutput: String, ?args:Args) {
-        var main = 'hxcs.examples.${example}';
+        testBuildAndRun('hxcs.examples.${example}', expectedOutput, args);
+    }
+    function testBuildAndRun(main: String, expectedOutput: String, ?args:Args) {
         var output = null;
 
         try{
@@ -90,19 +101,32 @@ class BuildAndRunTest {
 
     function transpile(program:String, args:Args): String {
         var haxeArgs = if(args.haxe == null) [] else args.haxe;
+        var classpaths = if(args.classpaths == null) ['.'] else args.classpaths;
 
         var outDir = Path.join([buildDir, 'examples', program]);
         FileSystem.createDirectory(outDir);
 
         var args = [
-            '-cs', outDir, '-D', 'no-compilation', '-cp', '.' , '--main', program, '-lib', 'hxcs'
-        ].concat(haxeArgs);
+            '-cs', outDir, '-D', 'no-compilation', '--main', program, '-lib', 'hxcs'
+        ].concat(haxeArgs)
+        .concat(classpathArgs(classpaths));
 
         checkCommand('haxe', args,
             'Transpilation of haxe program $program failed'
         );
 
         return outDir;
+    }
+
+    function classpathArgs(classpaths:Array<String>) {
+        var args = [];
+
+        for (cp in classpaths){
+            args.push('-cp');
+            args.push(cp);
+        }
+
+        return args;
     }
 
     function compile(outDir:String, program:String): String {

@@ -1,5 +1,6 @@
 package compiler.cs.compilation;
 
+import haxe.io.Path;
 import input.Data;
 
 
@@ -44,6 +45,10 @@ class CompilerParameters{
 
 	public static function make(param: CompilerParameters) {
 		return param;
+	}
+
+	public function csProj() {
+		return Path.withExtension(this.name, 'csproj');
 	}
 
 	public function clone(): CompilerParameters {

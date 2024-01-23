@@ -21,7 +21,7 @@ class CsProjectGenerator implements ProjectWriter{
 		var bytes = new BytesOutput();
 		new CsProjWriter(bytes).write(params);
 
-		var projectPath = params.name + ".csproj";
+		var projectPath = params.csProj();
 		var bytes = bytes.getBytes();
 		if (system.exists(projectPath))
 		{
