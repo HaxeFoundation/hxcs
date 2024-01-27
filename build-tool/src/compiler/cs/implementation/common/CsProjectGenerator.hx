@@ -33,6 +33,7 @@ class CsProjectGenerator implements ProjectWriter{
 	}
 
 	function log(text: String, ?pos:haxe.PosInfos) {
-		this.logger.log(text, pos);
+		if(logger != null)
+			this.logger.log(text, pos);
 	}
 }

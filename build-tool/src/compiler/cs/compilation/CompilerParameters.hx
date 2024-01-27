@@ -51,6 +51,10 @@ class CompilerParameters{
 		return Path.withExtension(this.name, 'csproj');
 	}
 
+	public function isDefined(option:String) {
+		return data != null && data.defines.exists(option);
+	}
+
 	public function clone(): CompilerParameters {
 		return {
 			data: data,
@@ -67,7 +71,8 @@ class CompilerParameters{
 			csharpCompiler: csharpCompiler,
 			arch: arch,
 			outDir: outDir,
-			output: output
+			output: output,
+			dotnetCore: dotnetCore
 		};
 	}
 }

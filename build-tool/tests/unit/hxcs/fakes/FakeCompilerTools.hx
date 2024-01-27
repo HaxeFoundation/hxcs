@@ -1,5 +1,6 @@
 package hxcs.fakes;
 
+import org.hamcrest.Exception.IllegalArgumentException;
 import compiler.cs.system.System;
 import proxsys.fakes.CommandMatcher.CommandSpec;
 import proxsys.fakes.CommandMatcher.CommandSpecMatcher;
@@ -19,6 +20,9 @@ class FakeCompilerTools {
     public static function givenCompiler(
         fakeSys:SystemFake, command:String, ?checkArgs:Array<String>, ?system:String)
     {
+        if(command == null)
+            throw new IllegalArgumentException("Invalid compiler command");
+
         if(checkArgs == null) checkArgs = ['-help'];
 
         if (system == "Windows"){

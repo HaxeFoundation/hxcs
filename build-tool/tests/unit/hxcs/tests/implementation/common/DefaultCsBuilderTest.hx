@@ -1,6 +1,6 @@
-package hxcs.tests.implementation.classic;
+package hxcs.tests.implementation.common;
 
-import compiler.cs.implementation.classic.ClassicCsBuilder;
+import compiler.cs.implementation.common.DefaultCsBuilder;
 import compiler.cs.compilation.pipeline.CsBuilder;
 import hxcs.helpers.DataGenerator;
 import compiler.cs.compilation.CompilerParameters;
@@ -10,7 +10,7 @@ import org.hamcrest.Matchers.*;
 import hxcs.helpers.ExceptionAssertions.*;
 
 
-class ClassicCsBuilderTest {
+class DefaultCsBuilderTest {
 	var system:SystemFake;
 	var builder:CsBuilder;
 	
@@ -24,7 +24,7 @@ class ClassicCsBuilderTest {
 	@Before
 	public function setup() {
 		system = new SystemFake();
-		builder = new ClassicCsBuilder(system);
+		builder = new DefaultCsBuilder(system);
 	}
 
 	@Test
@@ -62,7 +62,7 @@ class ClassicCsBuilderTest {
 
 		when_building();
 
-		should_execute_with(command, [ClassicCsBuilder.StoredArgs]);
+		should_execute_with(command, [DefaultCsBuilder.StoredArgs]);
 		should_save_content('cmd', args.join('\n'));
 	}
 

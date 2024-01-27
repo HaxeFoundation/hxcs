@@ -1,4 +1,4 @@
-package compiler.cs.implementation.classic;
+package compiler.cs.implementation.common;
 
 import compiler.cs.compilation.pipeline.CsBuilder;
 import compiler.cs.tools.Logger;
@@ -6,7 +6,7 @@ import compiler.cs.compilation.CompilerParameters;
 import compiler.cs.system.System;
 
 
-class ClassicCsBuilder implements CsBuilder{
+class DefaultCsBuilder implements CsBuilder{
 	public static final StoredArgs = '@cmd';
 
 	var system:System;
@@ -53,6 +53,6 @@ class ClassicCsBuilder implements CsBuilder{
 			return false;
 		}
 
-		return params.data.defines.exists("LONG_COMMAND_LINE");
+		return params.data.defines.exists(defineName);
 	}
 }

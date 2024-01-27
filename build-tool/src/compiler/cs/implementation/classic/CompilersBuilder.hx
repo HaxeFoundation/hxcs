@@ -7,6 +7,7 @@ import compiler.cs.implementation.classic.finders.CustomCompilerFinder;
 import compiler.cs.implementation.classic.finders.MonoCompilerFinder;
 import compiler.cs.implementation.classic.finders.MsvcCompilerFinder;
 import compiler.cs.implementation.common.CsProjectGenerator;
+import compiler.cs.implementation.common.DefaultCsBuilder;
 
 import compiler.cs.system.System;
 import compiler.cs.tools.Logger;
@@ -52,7 +53,7 @@ class CompilersBuilder {
             finder,
             new CsProjectGenerator(sys, log),
             new CompilerArgsGenerator(sys,log),
-            new ClassicCsBuilder(sys, log),
+            new DefaultCsBuilder(sys, log),
             new LocalLibsCloner(sys, log)
         );
     }

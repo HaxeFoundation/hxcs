@@ -1,5 +1,6 @@
 package compiler.cs;
 
+import compiler.cs.implementation.dotnet.DotnetCoreCompilerBuilder;
 import compiler.cs.implementation.classic.CompilersBuilder;
 import compiler.cs.implementation.common.ParametersParser;
 import compiler.cs.compilation.CsCompiler;
@@ -24,11 +25,9 @@ class CSharpCompiler extends Compiler
 	var logger:Logger;
 
 	var paramParser  :ParametersParser;
-
-	var compilers    :Array<CsCompiler>;
 	var csSelector	 :CompilerSelector;
 
-	var params :CompilerParameters;
+	public var compilers(default, default):Array<CsCompiler>;
 
 	public function new(cmd:CommandLine, ?system:System, ?logger:Logger)
 	{
@@ -37,8 +36,10 @@ class CSharpCompiler extends Compiler
 		this.logger = if(logger != null) logger else new Logger();
 
 		var builder = CompilersBuilder.builder(this.system, this.logger);
+		var dotnetBuilder = DotnetCoreCompilerBuilder.builder(this.system, this.logger);
 
 		this.compilers = [
+			dotnetBuilder.build(),
 			builder.customCompiler(),
 			builder.msvcCompiler(),
 			builder.monoCompiler()
@@ -53,12 +54,12 @@ class CSharpCompiler extends Compiler
 		var params = preProcess(data);
 		createBuildDirectory();
 
-		var compiler = findCompiler();
+		var compiler = findCompiler(params);
 		compiler.compile(params);
 	}
 
 	function preProcess(data:Data) {
-		params = paramParser.parse(data, cmd.output);
+		var params = paramParser.parse(data, cmd.output);
 		logger.verbose = params.verbose;
 
 		return params;
@@ -70,7 +71,7 @@ class CSharpCompiler extends Compiler
 			system.createDirectory("bin");
 	}
 
-	function findCompiler(){
+	function findCompiler(params:CompilerParameters){
 		return this.csSelector.selectFrom(compilers, params);
 	}
 }

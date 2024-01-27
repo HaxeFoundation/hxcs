@@ -7,8 +7,8 @@ using hxcs.fakes.FakeCompilerTools;
 
 
 class DotnetFinderTest extends CompilerFinderBaseTest{
-	static final DotnetCompiler = 'dotnet';
-	static final CheckDotnetArgs = ['--list-sdks'];
+	static final DotnetCompiler = DotnetCompilerFinder.COMPILER_CMD;
+	static final CheckDotnetArgs = DotnetCompilerFinder.CHECK_COMPILER_ARGS;
 
 
 
