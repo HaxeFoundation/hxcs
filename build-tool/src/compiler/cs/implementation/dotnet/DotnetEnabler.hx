@@ -10,7 +10,7 @@ class DotnetEnabler implements EnvironmentConfigurator{
     public function configure(params:CompilerParameters):CompilerParameters {
         var clone = params.clone();
 
-        clone.dotnetCore = !params.isDefined("no-dotnetcore");
+        clone.dotnetCore = true;
 
         return clone;
     }

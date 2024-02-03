@@ -1,8 +1,9 @@
 package hxcs.tests.compiler;
 
+import haxe.io.Path;
 import hxcs.helpers.DataGenerator;
-import proxsys.fakes.CommandMatcher.CommandSpecMatcher;
-import proxsys.fakes.CommandMatcher.CommandSpec;
+import proxsys.fakes.command.CommandSpecMatcher;
+import proxsys.fakes.command.CommandSpec;
 import input.Data;
 import hxcs.fakes.CommandLineFake;
 import hxcs.fakes.SystemFake;
@@ -74,10 +75,49 @@ class BaseCompilerTests {
                 this.fakeSys.system.putEnv(env_var, env_value);
             }
         }
+
+    }
+
+    function givenDataWith(optData:DataOptional) {
+        this.data = DataGenerator.dataWith(optData);
     }
 
     function givenCompiler(command:String, ?checkArgs:Array<String>, ?system:String) {
         fakeSys.givenCompiler(command, checkArgs, system);
+    }
+
+    function givenCompilers(compilers:Array<String>) {
+        for(comp in compilers){
+            givenCompiler(compilerWithExtension(comp));
+        };
+    }
+
+    function compilerWithExtension(cmd:String, ?systemName:String) {
+        if(systemName == null)
+            systemName = this.fakeSys.systemName();
+
+        var executable = Path.withoutDirectory(cmd);
+        var ext = (Path.withoutExtension(executable) == "csc" ? "exe" : "bat");
+
+        return (systemName == "Windows") ? Path.withExtension(cmd, ext) : cmd;
+    }
+
+    function shouldSelectCompiler(
+        expected:String, checkArgs:Array<String>, ?options:CompilationOptions)
+    {
+        if(options == null) options = {};
+
+        if(options.hasCompilerCheck != false){
+            shouldUseCompilerWith(expected, checkArgs, true);
+        }
+        shouldUseCompilerWith(expected, (cmdSpec:CommandSpec)->{
+            for (arg in checkArgs){
+                if(cmdSpec.args.contains(arg)){
+                    return false;
+                }
+            }
+            return true;
+        });
     }
 
     function shouldUseCompilerWith(

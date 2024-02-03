@@ -2,7 +2,7 @@ package hxcs.fakes;
 
 import sys.FileStat;
 import haxe.io.Bytes;
-import proxsys.fakes.CommandMatcher.CommandSpecMatcher;
+import proxsys.fakes.command.CommandSpecMatcher;
 import compiler.cs.system.ProcessInstance;
 import proxsys.fakes.FakeFiles;
 import proxsys.FakeSystem;

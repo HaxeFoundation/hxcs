@@ -1,9 +1,10 @@
 package hxcs.tests.compiler;
 
+import haxe.Exception;
 import haxe.io.Bytes;
 import haxe.io.Path;
 import hxcs.tests.compiler.BaseCompilerTests.CompilationOptions;
-import proxsys.fakes.CommandMatcher.CommandSpec;
+import proxsys.fakes.command.CommandSpec;
 
 import org.hamcrest.Matchers.*;
 
@@ -178,35 +179,22 @@ class CompilerTest extends BaseCompilerTests{
             throw e;
         }
     }
-    function do_test_select_compiler(expected:String, ?existent:Array<String>, ?options:CompilationOptions) {
+
+    function do_test_select_compiler(expected:String, existent:Array<String>, ?options:CompilationOptions) {
         if(options == null)
             options = {};
+
+        // Given
         givenOptions(options);
+        givenCompilers(existent);
 
         expected = compilerWithExtension(expected);
 
-        for(comp in existent){
-            givenCompiler(compilerWithExtension(comp));
-        }
-
+        // When
         compiler.compile(data);
 
-        if(options.hasCompilerCheck != false){
-            shouldUseCompilerWith(expected, ['-help'], true);
-        }
-        shouldUseCompilerWith(expected, (cmdSpec:CommandSpec)->{
-            return !cmdSpec.args.contains('-help');
-        });
-    }
-
-    function compilerWithExtension(cmd:String, ?systemName:String) {
-        if(systemName == null)
-            systemName = this.fakeSys.systemName();
-
-        var executable = Path.withoutDirectory(cmd);
-        var ext = (Path.withoutExtension(executable) == "csc" ? "exe" : "bat");
-
-        return (systemName == "Windows") ? Path.withExtension(cmd, ext) : cmd;
+        // Then
+        shouldSelectCompiler(expected, ['-help'], options);
     }
 
     function should_have_copied(srcPath:String, dstPath:String, content:Bytes) {

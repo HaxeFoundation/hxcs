@@ -39,10 +39,13 @@ class CSharpCompiler extends Compiler
 		var dotnetBuilder = DotnetCoreCompilerBuilder.builder(this.system, this.logger);
 
 		this.compilers = [
-			dotnetBuilder.build(),
+			dotnetBuilder.requireEnabler(true).build(),
 			builder.customCompiler(),
 			builder.msvcCompiler(),
-			builder.monoCompiler()
+			builder.monoCompiler(),
+
+			// When no other compiler is found, select dotnet even if not explicitly enabled
+			dotnetBuilder.requireEnabler(false).build()
 		];
 
 		this.csSelector	   = new CompilerSelector();	

@@ -16,7 +16,9 @@ import compiler.cs.system.System;
 import compiler.cs.tools.Logger;
 
 
-class PipelineCompilerBuilder {
+typedef PipelineCompilerBuilder  = BasePipelineCompilerBuilder<PipelineCompilerBuilder>;
+
+class BasePipelineCompilerBuilder<Self:BasePipelineCompilerBuilder<Self>> {
 	var sys:System;
 	var log:Null<Logger>;
 
@@ -41,37 +43,41 @@ class PipelineCompilerBuilder {
 
 	public function system(system:System) {
 		this.sys = system;
-		return this;
+		return self();
 	}
 
 	public function logger(logger:Null<Logger>) {
 		this.log = logger;
-		return this;
+		return self();
 	}
 
 	public function finder(compilerFinder: CompilerFinder) {
 		this.compilerFinder = compilerFinder;
-		return this;
+		return self();
 	}
 
 	public function projectWriter(projWriter: ProjectWriter) {
 		this.projWriter = projWriter;
-		return this;
+		return self();
 	}
 
 	public function argumentGenerator(argsGenerator:ArgumentsGenerator) {
 		this.argsGenerator = argsGenerator;
-		return this;
+		return self();
 	}
 
 	public function csBuilder(builder:CsBuilder) {
 		this._csBuilder = builder;
-		return this;
+		return self();
 	}
 
 	public function addConfigurator(envConfig: EnvironmentConfigurator) {
 		this.composedConfig.addConfigurator(envConfig);
-		return this;
+		return self();
+	}
+
+	inline function self(): Self {
+		return cast(this);
 	}
 
 	public function build(

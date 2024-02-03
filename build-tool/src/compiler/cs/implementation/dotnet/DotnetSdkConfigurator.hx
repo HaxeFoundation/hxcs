@@ -26,7 +26,7 @@ class DotnetSdkConfigurator implements EnvironmentConfigurator{
 		log('list sdks output: $sdksText');
 
 		var sdks = parseSdks(sdksText);
-		var sdkVersion = choiceSdkVersion(sdks);
+		var sdkVersion = choiceSdkVersion(sdks, params);
 
 		return updateDotnetVersion(params, sdkVersion);
 	}
@@ -76,22 +76,42 @@ class DotnetSdkConfigurator implements EnvironmentConfigurator{
 			'Sdk info could not be parsed from text: "$sdkLine"');
 	}
 
-	public function choiceSdkVersion(sdks:Array<SdkInfo>): VersionInfo {
+	public function choiceSdkVersion(sdks:Array<SdkInfo>, ?params:CompilerParameters): VersionInfo {
 		if(sdks == null || sdks.length == 0)
 			throw new NotFoundSdk();
+	
+		var sdk = getDefinedSdk(sdks, params);
+		if(sdk != null){
+			return sdk.version;
+		}
 
+		return getGreatestSdk(sdks).version;
+	}
+
+	function getDefinedSdk(sdks:Array<SdkInfo>, params:Null<CompilerParameters>):SdkInfo {
+		var version = params != null ? params.getDefinesData(DotnetDefines.Enabler) : null;
+
+		for(sdk in sdks){
+			if(sdk.version.matches(version)){
+				return sdk;
+			}
+		}
+
+		return null;
+	}
+	function getGreatestSdk(sdks:Array<SdkInfo>) {
 		var sorted = sdks.copy();
 		sorted.sort((a, b)-> {
 			//Invert compare to get descending order
 			return -1 * SdkInfo.compare(a, b);
 		});
 
-		return sorted[0].version;
+		return sorted[0];
 	}
 
 	public function updateDotnetVersion(params:CompilerParameters, sdkVersion:VersionInfo): CompilerParameters {
 		if(sdkVersion == null || sdkVersion.major == null)
-			throw new ArgumentException('$sdkVersion', "Invalid sdk version");
+			throw new ArgumentException('$sdkVersion', 'Invalid sdk version: $sdkVersion');
 
 		var clone = params.clone();
 		clone.version = sdkVersion.major * 10;
@@ -194,5 +214,19 @@ class VersionInfo {
 		if(cmp == 0) cmp = Reflect.compare(version, other.version);
 
 		return cmp;
+	}
+
+	public function matches(version:Null<String>) {
+		if(version == null) return false;
+
+		var other = new VersionInfo(version);
+
+		return matchNumber(this.major, other.major)
+			&& (other.minor == null || matchNumber(this.minor, other.minor))
+			&& (other.patch == null || matchNumber(patch, other.patch));
+	}
+
+	function matchNumber(versionNumber:Null<Int>, matchNumber:Null<Int>) {
+		return versionNumber == matchNumber;
 	}
 }

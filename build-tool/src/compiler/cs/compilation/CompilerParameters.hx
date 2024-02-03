@@ -52,7 +52,8 @@ class CompilerParameters{
 	}
 
 	public function isDefined(option:String) {
-		return data != null && data.defines.exists(option);
+		return data != null &&
+			(data.defines.exists(option) || data.definesData.exists(option));
 	}
 
 	public function clone(): CompilerParameters {
@@ -74,5 +75,12 @@ class CompilerParameters{
 			output: output,
 			dotnetCore: dotnetCore
 		};
+	}
+
+	public function getDefinesData(defines:String): Null<String> {
+		if(defines == null || this.data == null || data.definesData == null)
+			return null;
+
+		return data.definesData.get(defines);
 	}
 }

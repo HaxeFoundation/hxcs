@@ -2,8 +2,8 @@ package hxcs.fakes;
 
 import org.hamcrest.Exception.IllegalArgumentException;
 import compiler.cs.system.System;
-import proxsys.fakes.CommandMatcher.CommandSpec;
-import proxsys.fakes.CommandMatcher.CommandSpecMatcher;
+import proxsys.fakes.command.CommandSpec;
+import proxsys.fakes.command.CommandSpecMatcher;
 import haxe.io.Bytes;
 import org.hamcrest.Matchers.*;
 import haxe.io.Path;

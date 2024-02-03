@@ -1,13 +1,14 @@
 package hxcs.tests.implementation.dotnet;
 
-import haxe.Rest;
+import haxe.exceptions.ArgumentException;
+import hxcs.helpers.DataGenerator;
 import hxcs.fakes.SystemFake;
+import compiler.cs.implementation.dotnet.DotnetDefines;
 import compiler.cs.implementation.dotnet.DotnetSdkConfigurator;
 import compiler.cs.compilation.CompilerParameters;
 import hxcs.helpers.CompilerParametersGenerator;
 
 import org.hamcrest.Matchers.*;
-
 
 
 class DotnetSdkConfiguratorTest {
@@ -23,10 +24,17 @@ class DotnetSdkConfiguratorTest {
 		sdkConfigurator = new DotnetSdkConfigurator(fakeSys);
 	}
 
+	static final SDK_EXAMPLE_6_0:SdkInfo =
+		{ version: '6.0.1',   path: '/other/path'};
+	static final SDK_EXAMPLE_7_0:SdkInfo =
+		{ version: '7.0.115', path: '/usr/lib/dotnet/sdk'};
+	static final SDK_EXAMPLE_8_0:SdkInfo =
+		{ version: '8.0.123', path: '/some/path'};
+
 	static final sdkListExample:Array<SdkInfo> = [
-		{ version: '7.0.115', path: '/usr/lib/dotnet/sdk'},
-		{ version: '8.0.123', path: '/some/path'},
-		{ version: '6.1.1',   path: '/other/path'}
+		SDK_EXAMPLE_7_0,
+		SDK_EXAMPLE_8_0,
+		SDK_EXAMPLE_6_0
 	];
 
 	@Test
@@ -93,6 +101,58 @@ ${expectedSdks[1].toString()}
 	}
 
 	@Test
+	public function choiceSpecifiedSdk() {
+		// Given
+		var expectedVersion = choiceOne([SDK_EXAMPLE_6_0, SDK_EXAMPLE_7_0]).version;
+		var versionText = '${expectedVersion.major}.${expectedVersion.minor}';
+
+		var params = CompilerParametersGenerator.parametersWith({
+			data: DataGenerator.dataWith({
+				definesData: [
+					DotnetDefines.Enabler => versionText
+				]
+			})
+		});
+
+		// When:
+		var foundVersion = sdkConfigurator.choiceSdkVersion(sdkListExample, params);
+
+		// Then:
+		assertThat(foundVersion, equalTo(expectedVersion),
+			'Choosen version does not match expected version');
+	}
+
+	@Test
+	public function version_matches() {
+		var params = [
+			{ version: '6.0.123', matches: '6', expected: true},
+			{ version: '6.0.123', matches: '6.0', expected: true},
+			{ version: '6.0.123', matches: '6.0.123', expected: true},
+			{ version: '6.0.123', matches: '7', expected: false},
+			{ version: '6.0.123', matches: '7.0.123', expected: false},
+			{ version: '6.0.123', matches: '6.1', expected: false},
+			{ version: '6.0.123', matches: '6.1.123', expected: false},
+			{ version: '6.0.123', matches: '6.0.124', expected: false},
+			{ version: '6.0.123', matches: '6.0.1234', expected: false},
+			{ version: '6.0.123', matches: '6.0.1', expected: false},
+		];
+
+		for(param in params){
+			test_version_matches(param.version, param.matches, param.expected);
+		}
+	}
+
+	function test_version_matches(v_text:String, matches:String, expected:Bool) {
+		var version = new VersionInfo(v_text);
+
+		var result = version.matches(matches);
+
+		var should = expected ? 'should' : 'should not';
+		assertThat(result, equalTo(expected),
+			'Version $v_text $should match $matches');
+	}
+
+	@Test
 	public function updateParametersVersion() {
 		//Given
 		var version = new VersionInfo('6.2.3');
@@ -123,5 +183,16 @@ ${expectedSdks[1].toString()}
 
 	function when_configuring_params(params:CompilerParameters) : CompilerParameters{
 		return sdkConfigurator.configure(params);
+	}
+
+
+	function choiceOne<T>(items:Array<T>): T {
+		if(items.length == 0)
+			throw new ArgumentException('items',
+				'Invalid argument items: should be a non empty array');
+
+		var index = Std.random(items.length);
+
+		return items[index];
 	}
 }
