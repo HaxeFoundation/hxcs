@@ -30,7 +30,19 @@ class BuildAndRunTest {
 
     @Test
     public function simpleExample() {
-        testBuildAndRunExample("Hello", "Hello World!\n");
+        runSimpleExample();
+    }
+
+    @Test
+    public function simpleExampleDotnetCore() {
+        runSimpleExample({
+            haxe: ['-D', 'dotnet_core']
+        });
+    }
+
+
+    function runSimpleExample(?args:Args) {
+        testBuildAndRunExample("Hello", "Hello World!\n", args);
     }
 
     @Test
