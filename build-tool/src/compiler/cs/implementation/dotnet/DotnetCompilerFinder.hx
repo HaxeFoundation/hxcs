@@ -2,6 +2,7 @@ package compiler.cs.implementation.dotnet;
 
 import compiler.cs.tools.Logger;
 import compiler.cs.system.System;
+import compiler.cs.compilation.CompilerDefines;
 import compiler.cs.compilation.CompilerParameters;
 import compiler.cs.implementation.common.BaseCompilerFinder;
 
@@ -24,7 +25,8 @@ class DotnetCompilerFinder extends BaseCompilerFinder{
 	}
 
 	public override function findCompiler(params:CompilerParameters):Null<String> {
-		if(requireEnabler && !params.isDefined(DotnetDefines.Enabler)){
+		if(requireEnabler && !params.isDefined(CompilerDefines.DotnetEnabler)){
+			log('Did not enabled Dotnet because parameter ${CompilerDefines.DotnetEnabler} was not defined');
 			return null;
 		}
 

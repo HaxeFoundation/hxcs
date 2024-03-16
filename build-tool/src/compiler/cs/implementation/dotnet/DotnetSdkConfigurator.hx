@@ -4,6 +4,7 @@ import compiler.cs.tools.Logger;
 import haxe.exceptions.ArgumentException;
 import haxe.Exception;
 import compiler.cs.system.System;
+import compiler.cs.compilation.CompilerDefines;
 import compiler.cs.compilation.CompilerParameters;
 import compiler.cs.compilation.pipeline.EnvironmentConfigurator;
 
@@ -89,7 +90,7 @@ class DotnetSdkConfigurator implements EnvironmentConfigurator{
 	}
 
 	function getDefinedSdk(sdks:Array<SdkInfo>, params:Null<CompilerParameters>):SdkInfo {
-		var version = params != null ? params.getDefinesData(DotnetDefines.Enabler) : null;
+		var version = params != null ? params.getDefinesData(CompilerDefines.DotnetEnabler) : null;
 
 		for(sdk in sdks){
 			if(sdk.version.matches(version)){

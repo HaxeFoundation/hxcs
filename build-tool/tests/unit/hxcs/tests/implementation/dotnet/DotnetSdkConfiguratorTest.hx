@@ -3,7 +3,7 @@ package hxcs.tests.implementation.dotnet;
 import haxe.exceptions.ArgumentException;
 import hxcs.helpers.DataGenerator;
 import hxcs.fakes.SystemFake;
-import compiler.cs.implementation.dotnet.DotnetDefines;
+import compiler.cs.compilation.CompilerDefines;
 import compiler.cs.implementation.dotnet.DotnetSdkConfigurator;
 import compiler.cs.compilation.CompilerParameters;
 import hxcs.helpers.CompilerParametersGenerator;
@@ -109,7 +109,7 @@ ${expectedSdks[1].toString()}
 		var params = CompilerParametersGenerator.parametersWith({
 			data: DataGenerator.dataWith({
 				definesData: [
-					DotnetDefines.Enabler => versionText
+					CompilerDefines.DotnetEnabler => versionText
 				]
 			})
 		});

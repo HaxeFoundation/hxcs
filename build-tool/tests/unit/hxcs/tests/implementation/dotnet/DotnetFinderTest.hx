@@ -1,8 +1,8 @@
 package hxcs.tests.implementation.dotnet;
 
 import hxcs.helpers.CompilerParametersGenerator;
+import compiler.cs.compilation.CompilerDefines;
 import compiler.cs.compilation.pipeline.CompilerFinder;
-import compiler.cs.implementation.dotnet.DotnetDefines;
 import compiler.cs.implementation.dotnet.DotnetCompilerFinder;
 
 import org.hamcrest.Matchers.*;
@@ -30,7 +30,7 @@ class DotnetFinderTest extends CompilerFinderBaseTest{
 		fakeSys.givenCompiler(DotnetCompiler, CheckDotnetArgs);
 
 		var compiler = compilerFinder.findCompiler(CompilerParametersGenerator.parametersWithData({
-			defines: [DotnetDefines.Enabler => true]
+			defines: [CompilerDefines.DotnetEnabler => true]
 		}));
 
 		fakeSys.shouldCheckCompiler(DotnetCompiler, CheckDotnetArgs);
@@ -45,7 +45,7 @@ class DotnetFinderTest extends CompilerFinderBaseTest{
 		var found = compilerFinder.findCompiler(givenParameters());
 
 		assertThat(found, is(nullValue()),
-			'Should not select compiler if ${DotnetDefines.Enabler} is not defined');
+			'Should not select compiler if ${CompilerDefines.DotnetEnabler} is not defined');
 	}
 
 	@Test

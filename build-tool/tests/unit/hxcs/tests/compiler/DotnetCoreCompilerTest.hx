@@ -2,11 +2,11 @@ package hxcs.tests.compiler;
 
 import haxe.io.Path;
 import compiler.cs.compilation.CsCompiler;
+import compiler.cs.compilation.CompilerDefines;
 import compiler.cs.compilation.CompilerParameters;
 import compiler.cs.compilation.pipeline.EnvironmentConfigurator;
 import compiler.cs.implementation.dotnet.DotnetCompilerFinder;
 import compiler.cs.implementation.dotnet.DotnetCoreCompilerBuilder;
-import compiler.cs.implementation.dotnet.DotnetDefines;
 import compiler.cs.implementation.dotnet.DotnetSdkConfigurator.SdkInfo;
 
 import org.hamcrest.Matchers.*;
@@ -35,7 +35,7 @@ class DotnetCoreCompilerTest extends BaseCompilerTests{
 		givenDotnetCoreSdk('8.0.0');
 		givenDataWith({
 			defines: [
-				DotnetDefines.Enabler => true
+				CompilerDefines.DotnetEnabler => true
 			]
 		});
 
@@ -55,7 +55,7 @@ class DotnetCoreCompilerTest extends BaseCompilerTests{
 		givenDotnetCoreSdk('8.0.0');
 		givenDataWith({
 			defines: [
-				DotnetDefines.Enabler => true
+				CompilerDefines.DotnetEnabler => true
 			]
 		});
 
@@ -70,7 +70,7 @@ class DotnetCoreCompilerTest extends BaseCompilerTests{
 		givenCompilers(['mcs', 'dmcs', 'gmcs']);
 		givenDotnetCoreSdk('7.0.2');
 		givenDataWith({
-			defines: [DotnetDefines.Enabler => true]
+			defines: [CompilerDefines.DotnetEnabler => true]
 		});
 
 		when_compiling();
