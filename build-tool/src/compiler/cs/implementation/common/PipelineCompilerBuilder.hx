@@ -1,7 +1,7 @@
 package compiler.cs.implementation.common;
 
 import haxe.Rest;
-import haxe.Exception;
+import compiler.cs.compilation.CompilerParameters;
 import compiler.cs.compilation.CsCompiler;
 import compiler.cs.compilation.pipeline.ProjectWriter;
 import compiler.cs.compilation.pipeline.CsBuilder;
@@ -27,6 +27,7 @@ class BasePipelineCompilerBuilder<Self:BasePipelineCompilerBuilder<Self>> {
 	var _csBuilder(default, null):CsBuilder;
 	var projWriter(default, null):ProjectWriter;
 	var compilerFinder(default, null):CompilerFinder;
+	var _afterBuild:ComposedCallback<CompilerParameters>;
 
 	public function new(system:System, ?logger:Logger) {
 		this.sys = system;
@@ -35,6 +36,7 @@ class BasePipelineCompilerBuilder<Self:BasePipelineCompilerBuilder<Self>> {
 		this._csBuilder = new DefaultCsBuilder(sys, log);
 		this.projWriter = new CsProjectGenerator(sys, log);
 		this.composedConfig = new ComposedConfigurator();
+		this._afterBuild = new ComposedCallback();
 	}
 
 	public static function builder(system:System, ?logger:Logger) {
@@ -76,6 +78,11 @@ class BasePipelineCompilerBuilder<Self:BasePipelineCompilerBuilder<Self>> {
 		return self();
 	}
 
+	public function afterBuild(afterBuild: AfterBuildCallback) {
+		this._afterBuild.add(afterBuild);
+		return self();
+	}
+
 	inline function self(): Self {
 		return cast(this);
 	}
@@ -94,7 +101,8 @@ class BasePipelineCompilerBuilder<Self:BasePipelineCompilerBuilder<Self>> {
 			require('ProjectWriter', choice(projectWriter, this.projWriter)),
 			require('ArgumentsGenerator', choice(argsGenerator, this.argsGenerator)),
 			require('CsBuilder', choice(csBuilder, this._csBuilder)),
-			composedConfig
+			composedConfig,
+			_afterBuild.callback()
 		);
 	}
 

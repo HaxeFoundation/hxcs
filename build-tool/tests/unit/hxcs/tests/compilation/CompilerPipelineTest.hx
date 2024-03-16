@@ -1,5 +1,6 @@
 package hxcs.tests.compilation;
 
+import hxcs.fakes.FakeCallback;
 import compiler.cs.compilation.pipeline.CompilerPipeline;
 import hxcs.fakes.FakeBuilder;
 import hxcs.fakes.FakeArgumentsGenerator;
@@ -22,6 +23,7 @@ class CompilerPipelineTest{
 	var fakeArgsGenerator:FakeArgumentsGenerator;
 	var fakeBuilder:FakeBuilder;
 	var fakeConfigurer:FakeEnvironmentConfigurator;
+	var fakeAfterBuild:FakeCallback<CompilerParameters>;
 
 	var found:Bool;
 	var buildParams:CompilerParameters;
@@ -37,9 +39,11 @@ class CompilerPipelineTest{
 		fakeArgsGenerator = new FakeArgumentsGenerator();
 		fakeBuilder = new FakeBuilder();
 		fakeConfigurer = new FakeEnvironmentConfigurator();
+		fakeAfterBuild = new FakeCallback<CompilerParameters>();
 
 		compiler = new CompilerPipeline(
-			fakeFinder, fakeProjWriter, fakeArgsGenerator, fakeBuilder, fakeConfigurer
+			fakeFinder, fakeProjWriter, fakeArgsGenerator, fakeBuilder, fakeConfigurer,
+			fakeAfterBuild.callback()
 		);
 	}
 
@@ -122,6 +126,17 @@ class CompilerPipelineTest{
 		);
 	}
 
+	@Test
+	public function after_build_callback() {
+		given_an_after_build_callback();
+		given_a_compiler_was_found();
+
+		when_compiling_with(anyParam());
+
+		then_after_build_should_be_called_with(buildParams);
+	}
+
+
 	// -----------------------------------------------------------
 
 	function anyParam(): CompilerParameters {
@@ -159,6 +174,9 @@ class CompilerPipelineTest{
 		fakeConfigurer.replaceParametersWith(params);
 	}
 
+	function given_an_after_build_callback()
+	{}
+
 	function when_finding_compiler() {
 		found = compiler.findCompiler(anyParam());
 	}
@@ -180,5 +198,9 @@ class CompilerPipelineTest{
 
 	function should_find_compiler_once() {
 		fakeFinder.findShouldBeCalled(1);
+	}
+
+	function then_after_build_should_be_called_with(expectedParams:CompilerParameters) {
+		fakeAfterBuild.assertCalledWith(expectedParams);
 	}
 }

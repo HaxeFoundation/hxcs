@@ -1,5 +1,6 @@
 package compiler.cs.implementation.classic;
 
+import compiler.cs.implementation.common.ExtensionChanger;
 import compiler.cs.compilation.CsCompiler;
 import compiler.cs.compilation.pipeline.CompilerFinder;
 import compiler.cs.compilation.pipeline.CompilerPipeline;
@@ -54,7 +55,8 @@ class CompilersBuilder {
             new CsProjectGenerator(sys, log),
             new CompilerArgsGenerator(sys,log),
             new DefaultCsBuilder(sys, log),
-            new LocalLibsCloner(sys, log)
+            new LocalLibsCloner(sys, log),
+            ExtensionChanger.afterBuildCallback(sys)
         );
     }
 }

@@ -25,8 +25,16 @@ class SystemFake implements System{
         files = new FakeFiles();
     }
 
+    public function givenFile(path:String, content:String='') {
+        saveContent(path, content);
+    }
+
     public function exists(path:String):Bool {
         return files.exists(path);
+    }
+
+    public function rename(srcPath:String, newPath:String):Void{
+        files.rename(srcPath, newPath);
     }
 
     public function createDirectory(path:String) {

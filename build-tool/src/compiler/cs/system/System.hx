@@ -9,6 +9,8 @@ interface System {
     function readDirectory(path:String): Array<String>;
     function isDirectory(path:String): Bool;
 
+    function rename(srcPath:String, dstPath:String):Void;
+
     function getBytes(path:String):Bytes;
     function saveBytes(path:String, bytes:Bytes):Void;
     function saveContent(path:String, content:String):Void;

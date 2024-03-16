@@ -7,6 +7,7 @@ import hxcs.tests.implementation.dotnet.DotnetArgsGeneratorTest;
 import hxcs.tests.implementation.dotnet.DotnetSdkConfiguratorTest;
 import hxcs.tests.implementation.dotnet.DotnetFinderTest;
 import hxcs.tests.implementation.common.CsProjWriterTest;
+import hxcs.tests.implementation.common.ExtensionChangerTest;
 import hxcs.tests.implementation.common.DefaultCsBuilderTest;
 import hxcs.tests.implementation.classic.ClassicArgsGeneratorTest;
 import hxcs.tests.implementation.classic.finders.MsvcCompilerFinderTest;
@@ -36,6 +37,7 @@ class TestSuite extends massive.munit.TestSuite
 		add(hxcs.tests.implementation.dotnet.DotnetSdkConfiguratorTest);
 		add(hxcs.tests.implementation.dotnet.DotnetFinderTest);
 		add(hxcs.tests.implementation.common.CsProjWriterTest);
+		add(hxcs.tests.implementation.common.ExtensionChangerTest);
 		add(hxcs.tests.implementation.common.DefaultCsBuilderTest);
 		add(hxcs.tests.implementation.classic.ClassicArgsGeneratorTest);
 		add(hxcs.tests.implementation.classic.finders.MsvcCompilerFinderTest);

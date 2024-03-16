@@ -3,27 +3,31 @@ package hxcs.fakes;
 import compiler.cs.compilation.CompilerParameters;
 import compiler.cs.compilation.pipeline.EnvironmentConfigurator;
 
-import org.hamcrest.Matchers.*;
-
 
 class FakeEnvironmentConfigurator implements EnvironmentConfigurator{
-	public var capturedParameters:Null<CompilerParameters> = null;
-	public var replacedParameters:Null<CompilerParameters> = null;
+	public var capturedParameters(get, null):Null<CompilerParameters> = null;
+	public var replacedParameters(default, null):Null<CompilerParameters> = null;
+
+	var fakeCallback:FakeCallback<CompilerParameters>;
 
 	var configuredCalled:Bool = false;
 
 	public function new() {
+		fakeCallback = new FakeCallback();
+	}
+
+	function get_capturedParameters() {
+		return fakeCallback.capturedParameters;
 	}
 
 	public function configure(params:CompilerParameters):CompilerParameters {
-		configuredCalled = true;
-		this.capturedParameters = params;
+		fakeCallback.call(params);
 
 		if(replacedParameters != null){
 			return replacedParameters;
 		}
 
-		return capturedParameters;
+		return fakeCallback.capturedParameters;
 	}
 
 	public function replaceParametersWith(params:CompilerParameters) {
@@ -31,8 +35,6 @@ class FakeEnvironmentConfigurator implements EnvironmentConfigurator{
 	}
 
 	public function assertCalledWith(expected:CompilerParameters) {
-		assertThat(configuredCalled, is(true), "Configure was not called");
-		assertThat(capturedParameters, equalTo(expected),
-			"CompilerParameters used in configuration is not what expected");
+		fakeCallback.assertCalledWith(expected);
 	}
 }

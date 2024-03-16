@@ -17,6 +17,10 @@ class StdSystem implements System{
         FileSystem.createDirectory(path);
     }
 
+    public function rename(srcPath:String, newPath:String):Void{
+        FileSystem.rename(srcPath, newPath);
+    }
+
     public function startProcess(command:String, ?args:Array<String>) {
         return new SysProcess(command, args);
     }

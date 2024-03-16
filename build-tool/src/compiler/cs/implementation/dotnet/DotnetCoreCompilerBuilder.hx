@@ -7,6 +7,7 @@ import compiler.cs.compilation.pipeline.ProjectWriter;
 import compiler.cs.compilation.pipeline.ArgumentsGenerator;
 import compiler.cs.compilation.pipeline.CsBuilder;
 import compiler.cs.compilation.pipeline.EnvironmentConfigurator;
+import compiler.cs.implementation.common.ExtensionChanger;
 import compiler.cs.implementation.common.PipelineCompilerBuilder;
 import compiler.cs.implementation.dotnet.DotnetCompilerFinder.DotnetCompilerFinderOptions;
 import compiler.cs.system.System;
@@ -31,6 +32,8 @@ class DotnetCoreCompilerBuilder
             new DotnetEnabler(),
             new DotnetSdkConfigurator(system)
         ]);
+
+        afterBuild(ExtensionChanger.afterBuildCallback(system));
     }
 
     public function requireEnabler(require:Bool){

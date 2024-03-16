@@ -1,5 +1,8 @@
 package hxcs.tests;
 
+import proxsys.Files.RemoveMode;
+import proxsys.std.StdFiles;
+import haxe.PosInfos;
 import massive.munit.Assert;
 import haxe.Exception;
 import sys.io.Process;
@@ -11,7 +14,8 @@ import org.hamcrest.Matchers.*;
 typedef Args = {
     ?haxe   : Array<String>,
     ?program: Array<String>,
-    ?classpaths: Array<String>
+    ?classpaths: Array<String>,
+    ?expectedExtension:String,
 }
 
 class BuildAndRunTest {
@@ -37,6 +41,14 @@ class BuildAndRunTest {
     public function simpleExampleDotnetCore() {
         runSimpleExample({
             haxe: ['-D', 'dotnet_core']
+        });
+    }
+
+    @Test
+    public function setOutputExtension() {
+        runSimpleExample({
+            haxe: ['-D', 'dotnet_core', '-D', 'outputExtension=exe2'],
+            expectedExtension: "exe2"
         });
     }
 
@@ -82,6 +94,7 @@ class BuildAndRunTest {
     function testBuildAndRunExample(example: String, expectedOutput: String, ?args:Args) {
         testBuildAndRun('hxcs.examples.${example}', expectedOutput, args);
     }
+
     function testBuildAndRun(main: String, expectedOutput: String, ?args:Args) {
         var output = null;
 
@@ -103,19 +116,26 @@ class BuildAndRunTest {
         var packageParts = main.split(".");
         var programName  = packageParts[packageParts.length - 1];
 
-        var outDir  = transpile(main, args);
-        var bin     = compile(outDir, programName);
+        var outDir = exampleOutputDir(main);
+        cleanDirectory(outDir);
+        transpile(main, args, outDir);
+        var bin     = compile(outDir, programName, args.expectedExtension);
 
         var programArgs = if(args.program == null) [] else args.program;
 
         return checkCommand(bin, programArgs);
     }
 
-    function transpile(program:String, args:Args): String {
+    function cleanDirectory(outDir:String) {
+        new StdFiles().remove(outDir, RemoveMode.Recursive);
+    }
+
+    function transpile(program:String, args:Args, outDir:String): String {
+        log('transpile($program, $args)');
+
         var haxeArgs = if(args.haxe == null) [] else args.haxe;
         var classpaths = if(args.classpaths == null) ['.'] else args.classpaths;
 
-        var outDir = Path.join([buildDir, 'examples', program]);
         FileSystem.createDirectory(outDir);
 
         var args = [
@@ -130,6 +150,10 @@ class BuildAndRunTest {
         return outDir;
     }
 
+    function exampleOutputDir(program:String) {
+        return Path.join([buildDir, 'examples', program]);
+    }
+
     function classpathArgs(classpaths:Array<String>) {
         var args = [];
 
@@ -141,17 +165,23 @@ class BuildAndRunTest {
         return args;
     }
 
-    function compile(outDir:String, program:String): String {
+    function compile(outDir:String, program:String, extension:String=null): String {
         // haxelib run-dir hxcs <projectDir> hxcs_build.txt --haxe-version 4302
         //     --feature-level 1 --out ../../../build/examples/example/bin/Hello
+        log('compile($outDir, $program, $extension)');
 
         var build_txt = Path.join([outDir, 'hxcs_build.txt']);
         var binPath   = Path.join([outDir, 'bin', program]);
 
         checkCommand('haxelib', ['run-dir', 'hxcs', projectDir, build_txt, '--out', binPath]);
 
-        if(Sys.systemName() == "Windows" || !FileSystem.exists(binPath)){
-            binPath += '.exe';
+        if(extension == null &&
+            (Sys.systemName() == "Windows" || !FileSystem.exists(binPath)))
+        {
+            extension = 'exe';
+        }
+        if(extension != null){
+            binPath = Path.withExtension(binPath, extension);
         }
 
         assertThat(FileSystem.exists(binPath), is(true),
@@ -181,6 +211,8 @@ class BuildAndRunTest {
 
         var stdout = p.stdout.readAll().toString();
 
+        log(stdout);
+
         if(exitCode != 0){
             var stderr = p.stderr.readAll().toString();
             var lines = [errMessage];
@@ -202,5 +234,12 @@ class BuildAndRunTest {
 
     function runProcess(command:String, args:Array<String>) {
         return new Process(command, args);
+    }
+
+    function log(text:String, ?pos:PosInfos) {
+        #if DEBUG
+        // trace(text, pos);
+        Sys.println(text);
+        #end
     }
 }
