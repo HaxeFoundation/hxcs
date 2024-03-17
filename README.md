@@ -12,14 +12,25 @@ It contains a build tool that is called by Haxe, discovering and calling the C# 
 ## Dotnet Core Support
 
 The build tool now supports using dotnet CLI to compile the generated C# project,
-when the `dotnet` tool is found.
+when the `dotnet` tool is found (and there is an available dotnet sdk).
 
-To enable `dotnet` set define: `-D dotnet-core`.
+In order to keep compatibility with previous hxcs versions, the `dotnet` CLI is not used by default, if msvc (on Windows) or Mono compilers are found.
 
-By default, the greatest available sdk is used to build the project.
-But, the required sdk can be selected with the `dotnet-core` option:
+So, to use `dotnet` CLI, set flag: `-D dotnet_core`.
 
-`-D dotnet-core=6.0` or `-D dotnet-core=7`, etc.
+The greatest available dotnet sdk will be used to build the project, by default.
+But, a preferred sdk can be selected with the `dotnet_core` option:
+
+`-D dotnet_core=6.0` or `-D dotnet_core=7`, etc.
+
+### Output extensions
+
+The "classic" toolchain (msvc or mono) will use `exe` extension for executables and `dll` for libraries.
+
+While dotnet cli may choose other extensions according to the operating system (in Linux for example, executables does not have an extension).
+
+To change the output extension, the `outputExtension` flag can be used.
+For example: `-D outputExtension=exe` can be used to rename the output extension to `exe`.
 
 ## For Contributors
 
@@ -58,7 +69,7 @@ process based on the following interfaces:
 * `ArgumentsGenerator`: generate the arguments used by the compiler tool;
 * `CsBuilder`: executes the compiler tool, using the generated arguments;
 
-Two main implementation are provided for these classes:
+Two main implementations are provided for these classes:
 
 * **Classic** (`compiler.cs.implementation.classic`): executes the _"classic"_ compilers, i.e., _Mono_ or _Msvc_ compiler tools;
 * **Dotnet** (`compiler.cs.implementation.dotnet`): uses the _dotnet_ CLI tool to build the project.
@@ -83,11 +94,11 @@ using the munit tool:
 
 #### Test dependencies
 
-Before building the tests, it's necessary to install the test dependencies, which can be mady through [haxelib].
+Before building the tests, it's necessary to install the test dependencies, which can be made through [haxelib].
 
-Both kinds of tests (unit tests and system tests) depends on [munit] and [hamcrest].
-Besides that, the unit tests also depends on the [proxsys] library
-which is used as fake implementation to the `compiler.cs.system` layer of the build tool,
+The tests are based on [munit] and [hamcrest].
+Besides that, the [proxsys] library is also used
+as fake implementation to the `compiler.cs.system` layer of the build tool,
 allowing to fake and verify system behaviors.
 
 The build-tool itself depends only of the haxe standard library.
