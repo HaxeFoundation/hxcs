@@ -1,0 +1,10 @@
+# rebuild compiler
+#
+--cwd build-tool
+build-cs.hxml
+
+# Run system tests
+#
+--next
+--cwd tests/system-test
+--cmd haxelib run munit test -neko

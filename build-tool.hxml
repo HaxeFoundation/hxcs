@@ -1,0 +1,4 @@
+# Short-cut to generate the build-tool (see build-tool/build-cs.hxml)
+#
+--cwd build-tool
+build-cs.hxml

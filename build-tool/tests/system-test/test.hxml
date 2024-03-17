@@ -1,0 +1,115 @@
+# ## Flash 9+
+# -main TestMain
+# -lib munit
+# -lib hamcrest
+# -cp ../../src
+# -cp ../../base/src
+# -D target_cs
+# -resource ../../csproj-template.mtt
+
+# -cp .
+# -swf-version 11
+# -swf ../../../build/system-test/as3_test.swf
+
+## JavaScript
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+-lib proxsys
+
+-cp .
+-js ../../../build/system-test/js_test.js
+
+## Neko
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+-lib proxsys
+
+-cp .
+-neko ../../../build/system-test/neko_test.n
+
+## CPP
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+-lib proxsys
+
+-cp .
+#-D HXCPP_M64
+-cpp ../../../build/system-test/cpp_test
+
+## Java
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+-lib proxsys
+
+-cp .
+-java ../../../build/system-test/java_test
+
+## CSharp
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+-lib proxsys
+
+-cp .
+-cs ../../../build/system-test/cs_test
+
+## Python
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+-lib proxsys
+
+-cp .
+-python ../../../build/system-test/python_test.py
+
+## PHP 7
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+-lib proxsys
+
+-cp .
+-D php7
+-php ../../../build/system-test/php_test
+
+## JavaScript NodeJS
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+-lib proxsys
+-lib hxnodejs
+
+-cp .
+-js ../../../build/system-test/js_test.js
+
+## HashLink
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+-lib proxsys
+
+-cp .
+-hl ../../../build/system-test/hl_test.hl
+
+## LUA
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+-lib proxsys
+
+-cp .
+-lua ../../../build/system-test/lua_test.lua

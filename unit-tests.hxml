@@ -1,0 +1,2 @@
+--cwd build-tool/tests/unit
+--cmd haxelib run munit test -neko

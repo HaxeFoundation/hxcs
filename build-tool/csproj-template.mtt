@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+::if dotnetCore::
+<Project Sdk="Microsoft.NET.Sdk">
+::else::
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+::end::
+
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -7,12 +12,21 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace></RootNamespace>
     <AssemblyName>::name::</AssemblyName>
+
+    ::if dotnetCore::
+    <TargetFramework>net::targetFramework::</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    ::else::
     <TargetFrameworkVersion>v::targetFramework::</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    ::end::
+
     <FileAlignment>512</FileAlignment>
-	::if unsafe::
-	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	::end::
+    ::if unsafe::
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    ::end::
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -50,7 +64,10 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    ::if !dotnetCore::
     <Reference Include="System" />
+    ::end::
+
   ::foreach refs::
   ::if (hint != null)::
     <Reference Include="::name::">
@@ -62,17 +79,19 @@
   ::end::
   </ItemGroup>
   <ItemGroup>
-	::foreach srcs::
+  ::foreach srcs::
     <Compile Include="::__current__::"/>
-	::end::
+  ::end::
   </ItemGroup>
   ::foreach res::
   <ItemGroup>
-	<EmbeddedResource Include="::__current__::" />
+  <EmbeddedResource Include="::__current__::" />
   </ItemGroup>
   ::end::
   <ItemGroup />
+  ::if !dotnetCore::
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  ::end::
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
